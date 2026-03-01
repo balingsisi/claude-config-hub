@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  githubId  String    @unique
+  name      String?
+  email     String?
+  image     String?
+  login     String? // GitHub username
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  favorites Favorite[]
+  ratings   Rating[]
+  comments  Comment[]
+
+  @@map("users")
+}
+
+model Template {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String
+  content     String    @db.Text
+  techStack   Json      // 存储技术栈信息
+  category    String
+
+  // 统计
+  views       Int       @default(0)
+  copies      Int       @default(0)
+  downloads   Int       @default(0)
+
+  // 状态
+  status      String    @default("pending") // pending, approved, rejected
+  submittedBy String?   // 提交者用户 ID
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  favorites   Favorite[]
+  ratings     Rating[]
+  comments   Comment[]
+
+  @@map("templates")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  templateId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template  Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, templateId])
+  @@index([userId])
+  @@index([templateId])
+  @@map("favorites")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  templateId String
+  score     Int // 1-5
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template  Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, templateId])
+  @@index([templateId])
+  @@map("ratings")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  templateId String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template  Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@index([createdAt])
+  @@map("comments")
+}
