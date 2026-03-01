@@ -37,6 +37,21 @@ pnpm dev
 
 访问 [http://localhost:3000](http://localhost:3000) 查看结果。
 
+## 📖 文档导航
+
+**项目文档已整理到 `docs/` 目录**：
+
+- **[📚 文档索引](docs/README.md)** - 完整的文档导航和说明
+- **[✅ 任务清单](docs/task-checklist.md)** - 当前任务进度和状态
+- **[📋 集成计划](docs/planning/claude-config-hub-integrated-plan.md)** - 三阶段策略
+- **[🏗️ 技术架构](docs/architecture/technical-architecture.md)** - 技术栈和设计
+- **[🗄️ Supabase 设置](docs/guides/SUPABASE_SETUP.md)** - 数据库配置指南
+
+**快速链接**：
+- [Claude 工作指南](CLAUDE.md) - Claude Code 开发规范
+- [贡献指南](CONTRIBUTING.md) - 如何贡献项目
+- [完整文档目录](docs/README.md) - 查看所有文档
+
 ## 🧰 开发命令
 
 ```bash
@@ -75,8 +90,17 @@ claude-config-hub/
 │   ├── lib/             # 工具函数
 │   ├── types/           # TypeScript 类型定义
 │   └── data/            # 静态数据
+├── docs/                # 📖 项目文档
+│   ├── README.md        # 文档索引 - **从这里开始**
+│   ├── task-checklist.md # 任务清单 - 查看进度
+│   ├── planning/        # 项目规划
+│   ├── logs/            # 开发日志
+│   ├── reports/         # 项目报告
+│   ├── guides/          # 设置指南
+│   └── architecture/    # 技术架构
 ├── public/              # 静态资源
-└── docs/               # 文档
+├── CLAUDE.md            # Claude Code 工作指南
+└── README.md            # 本文件
 ```
 
 ## 🤝 贡献
