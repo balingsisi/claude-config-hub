@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, Filter, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -246,11 +247,20 @@ function FilterBar({
 // 主页面组件
 export default function TemplatesPage() {
   const [searchQuery, setSearchQuery] = React.useState('')
+  const [debouncedQuery, setDebouncedQuery] = React.useState('')
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null)
   const [selectedFramework, setSelectedFramework] = React.useState<string | null>(null)
   const [selectedLanguage, setSelectedLanguage] = React.useState<string | null>(null)
   const [sortBy, setSortBy] = React.useState<'popular' | 'recent' | 'rating'>('popular')
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading] = React.useState(false) // 静态数据不需要加载状态
+
+  // 防抖搜索 (300ms)
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   // 提取唯一值
   const categories = React.useMemo(
@@ -267,12 +277,12 @@ export default function TemplatesPage() {
   )
 
   // 筛选和排序逻辑
-  const filteredTemplates = React.useMemo(() => {
+  const filteredTemplates = useMemo(() => {
     let filtered = [...templates]
 
-    // 搜索过滤
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+    // 搜索过滤 (使用防抖后的查询)
+    if (debouncedQuery) {
+      const query = debouncedQuery.toLowerCase()
       filtered = filtered.filter(
         (t) =>
           t.name.toLowerCase().includes(query) ||
