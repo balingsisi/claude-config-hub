@@ -82,6 +82,25 @@ export const metadata: Metadata = {
   },
 }
 
+// Organization JSON-LD for the entire site
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Claude Config Hub',
+  description: 'CLAUDE.md 配置模板社区平台，帮助开发者快速配置 Claude Code',
+  url: 'https://claudeconfig.com',
+  logo: 'https://claudeconfig.com/logo.png',
+  sameAs: [
+    'https://github.com/claudeconfig',
+    'https://twitter.com/claudeconfig',
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    availableLanguage: ['Chinese', 'English'],
+  },
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -89,6 +108,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <SessionProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

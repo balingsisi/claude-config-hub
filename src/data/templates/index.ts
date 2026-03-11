@@ -11,6 +11,7 @@ import pythonFastApiContent from './python-fastapi.md'
 import rustWebContent from './rust-web.md'
 import flutterMobileContent from './flutter-mobile.md'
 import monorepoTurborepoContent from './monorepo-turborepo.md'
+import angularEnterpriseContent from './angular-enterprise.md'
 
 export const templates: Template[] = [
   {
@@ -323,6 +324,37 @@ export const templates: Template[] = [
       copies: 12,
       stars: 6,
       forks: 1,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'angular-enterprise',
+    name: 'Angular Enterprise Application',
+    slug: 'angular-enterprise',
+    description: 'Large-scale enterprise application with Angular 17, NgRx state management, and scalable architecture',
+    content: angularEnterpriseContent,
+    tags: ['angular', 'typescript', 'ngrx', 'rxjs', 'enterprise', 'frontend'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Angular',
+      frameworkVersion: '17+',
+      language: 'TypeScript',
+      languageVersion: '5.2+',
+      testing: ['Jest', 'Spectator', 'Cypress'],
+    },
+    stats: {
+      views: 35,
+      copies: 15,
+      stars: 8,
+      forks: 2,
     },
     status: TemplateStatus.PUBLISHED,
     featured: false,
