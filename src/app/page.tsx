@@ -1,9 +1,24 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/header-client'
+import { getFeaturedTemplates } from '@/data/templates'
+import type { Metadata } from 'next'
+
+// SEO Metadata
+export const metadata: Metadata = {
+  title: 'CLAUDE.md 模板库 - 发现高质量的项目配置模板',
+  description: '浏览和复制精选的 CLAUDE.md 模板，让 Claude Code 更好地理解你的项目。涵盖 Next.js、React、Django、Node.js 等主流技术栈。',
+  keywords: ['CLAUDE.md', 'Claude Code', '项目配置', 'Next.js', 'React', '模板库'],
+  openGraph: {
+    title: 'CLAUDE.md 模板库',
+    description: '发现、浏览和使用高质量的 CLAUDE.md 模板',
+    type: 'website',
+  },
+}
 
 export default function HomePage() {
+  const featuredTemplates = getFeaturedTemplates().slice(0, 6)
   return (
     <div className="flex min-h-screen flex-col">
       <Header />

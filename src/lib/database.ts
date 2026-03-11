@@ -51,7 +51,7 @@ export const db = {
       name: string
       description: string
       content: string
-      techStack: any
+      techStack: Record<string, unknown>
       category: string
       submittedBy?: string
     }) => {
