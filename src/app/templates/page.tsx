@@ -6,30 +6,31 @@ import Link from 'next/link'
 import { Search, Filter, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { templates } from '@/data/templates'
 import type { Template, TemplateCategory, TemplateDifficulty } from '@/types'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Header } from '@/components/header-client'
 
-// 骨架屏组件
+// 骨架屏组件 - 使用 shadcn/ui Skeleton
 function TemplateCardSkeleton() {
   return (
     <Card className="group hover:shadow-lg transition-shadow">
       <CardHeader>
-        <div className="h-6 w-3/4 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-muted mt-2" />
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-1/2 mt-2" />
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="h-4 w-full animate-pulse rounded bg-muted" />
-          <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
       </CardContent>
       <CardFooter>
-        <div className="flex gap-2">
-          <div className="h-8 w-20 animate-pulse rounded bg-muted" />
-          <div className="h-8 w-20 animate-pulse rounded bg-muted" />
+        <div className="flex gap-2 w-full">
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-20" />
         </div>
       </CardFooter>
     </Card>
@@ -189,14 +190,14 @@ function FilterBar({
   onLanguageChange,
 }: FilterBarProps) {
   return (
-    <div className="flex flex-wrap gap-4 items-center p-4 bg-muted/50 rounded-lg">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 items-start sm:items-center p-3 sm:p-4 bg-muted/50 rounded-lg">
       {/* 类别筛选 */}
-      <div className="flex items-center gap-2">
-        <Filter className="h-4 w-4 text-muted-foreground" />
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         <select
           value={selectedCategory || ''}
           onChange={(e) => onCategoryChange(e.target.value || null)}
-          className="rounded-md border bg-background px-3 py-1.5 text-sm"
+          className="rounded-md border bg-background px-3 py-2 sm:py-1.5 text-sm flex-1 sm:flex-none min-h-[44px] sm:min-h-0"
         >
           <option value="">所有类别</option>
           {categories.map((cat) => (
@@ -208,12 +209,12 @@ function FilterBar({
       </div>
 
       {/* 框架筛选 */}
-      <div className="flex items-center gap-2">
-        <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <SlidersHorizontal className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         <select
           value={selectedFramework || ''}
           onChange={(e) => onFrameworkChange(e.target.value || null)}
-          className="rounded-md border bg-background px-3 py-1.5 text-sm"
+          className="rounded-md border bg-background px-3 py-2 sm:py-1.5 text-sm flex-1 sm:flex-none min-h-[44px] sm:min-h-0"
         >
           <option value="">所有框架</option>
           {frameworks.map((fw) => (
@@ -225,12 +226,12 @@ function FilterBar({
       </div>
 
       {/* 语言筛选 */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
         <span className="text-sm text-muted-foreground">语言:</span>
         <select
           value={selectedLanguage || ''}
           onChange={(e) => onLanguageChange(e.target.value || null)}
-          className="rounded-md border bg-background px-3 py-1.5 text-sm"
+          className="rounded-md border bg-background px-3 py-2 sm:py-1.5 text-sm flex-1 sm:flex-none min-h-[44px] sm:min-h-0"
         >
           <option value="">所有语言</option>
           {languages.map((lang) => (
@@ -252,12 +253,21 @@ export default function TemplatesPage() {
   const [selectedFramework, setSelectedFramework] = React.useState<string | null>(null)
   const [selectedLanguage, setSelectedLanguage] = React.useState<string | null>(null)
   const [sortBy, setSortBy] = React.useState<'popular' | 'recent' | 'rating'>('popular')
-  const [isLoading] = React.useState(false) // 静态数据不需要加载状态
+  const [isSearching, setIsSearching] = React.useState(false)
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true)
 
-  // 防抖搜索 (300ms)
+  // 初始加载完成
   React.useEffect(() => {
+    const timer = setTimeout(() => setIsInitialLoad(false), 500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // 防抖搜索 (300ms) + 加载状态
+  React.useEffect(() => {
+    setIsSearching(true)
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery)
+      setIsSearching(false)
     }, 300)
     return () => clearTimeout(timer)
   }, [searchQuery])
@@ -339,14 +349,22 @@ export default function TemplatesPage() {
         {/* Search Bar */}
         <div className="mb-6 max-w-2xl mx-auto">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className={cn(
+              "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-opacity",
+              isSearching && "opacity-50 animate-pulse"
+            )} />
             <input
               type="text"
               placeholder="搜索模板..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border bg-background pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-md border bg-background pl-10 pr-12 py-3 sm:py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary min-h-[44px]"
             />
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -380,7 +398,7 @@ export default function TemplatesPage() {
         </div>
 
         {/* Template Grid */}
-        {isLoading ? (
+        {isInitialLoad || isSearching ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <TemplateCardSkeleton key={i} />
