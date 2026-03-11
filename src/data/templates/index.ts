@@ -6,6 +6,11 @@ import reactComponentLibraryContent from './react-component-library.md'
 import t3StackContent from './t3-stack.md'
 import djangoRestApiContent from './django-rest-api.md'
 import nodejsExpressApiContent from './nodejs-express-api.md'
+import vue3ViteContent from './vue-3-vite.md'
+import pythonFastApiContent from './python-fastapi.md'
+import rustWebContent from './rust-web.md'
+import flutterMobileContent from './flutter-mobile.md'
+import monorepoTurborepoContent from './monorepo-turborepo.md'
 
 export const templates: Template[] = [
   {
@@ -166,6 +171,163 @@ export const templates: Template[] = [
     featured: false,
     createdAt: '2026-03-01T00:00:00.000Z',
     updatedAt: '2026-03-01T00:00:00.000Z',
+  },
+  {
+    id: 'vue-3-vite',
+    name: 'Vue 3 + Vite Application',
+    slug: 'vue-3-vite',
+    description: 'Modern Vue 3 application with Composition API, Pinia state management, and Vue Router',
+    content: vue3ViteContent,
+    tags: ['vue', 'vite', 'pinia', 'vue-router', 'typescript', 'frontend'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Vue',
+      frameworkVersion: '3.4+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      testing: ['Vitest', 'Vue Test Utils', 'Playwright'],
+    },
+    stats: {
+      views: 45,
+      copies: 22,
+      stars: 10,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'python-fastapi',
+    name: 'Python FastAPI Service',
+    slug: 'python-fastapi',
+    description: 'High-performance async API with FastAPI, SQLAlchemy, Pydantic validation, and automatic docs',
+    content: pythonFastApiContent,
+    tags: ['python', 'fastapi', 'sqlalchemy', 'pydantic', 'api', 'async'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'FastAPI',
+      frameworkVersion: '0.109+',
+      language: 'Python',
+      languageVersion: '3.11+',
+      database: 'PostgreSQL (SQLAlchemy)',
+      testing: ['pytest', 'pytest-asyncio'],
+    },
+    stats: {
+      views: 50,
+      copies: 25,
+      stars: 12,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'rust-web',
+    name: 'Rust Web Service',
+    slug: 'rust-web',
+    description: 'High-performance type-safe web service with Actix-web, Diesel ORM, and PostgreSQL',
+    content: rustWebContent,
+    tags: ['rust', 'actix-web', 'diesel', 'postgresql', 'api', 'performance'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Actix-web',
+      frameworkVersion: '4.4+',
+      language: 'Rust',
+      languageVersion: '1.75+',
+      database: 'PostgreSQL (Diesel)',
+      testing: ['cargo test', 'cargo-nextest'],
+    },
+    stats: {
+      views: 35,
+      copies: 15,
+      stars: 8,
+      forks: 1,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'flutter-mobile',
+    name: 'Flutter Mobile App',
+    slug: 'flutter-mobile',
+    description: 'Cross-platform mobile app with Flutter, Riverpod state management, and go_router navigation',
+    content: flutterMobileContent,
+    tags: ['flutter', 'dart', 'riverpod', 'mobile', 'ios', 'android'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Flutter',
+      frameworkVersion: '3.16+',
+      language: 'Dart',
+      languageVersion: '3.2+',
+      testing: ['flutter_test', 'integration_test'],
+    },
+    stats: {
+      views: 40,
+      copies: 20,
+      stars: 9,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'monorepo-turborepo',
+    name: 'Turborepo Monorepo',
+    slug: 'monorepo-turborepo',
+    description: 'Scalable monorepo with Turborepo, shared packages, and optimized build pipeline',
+    content: monorepoTurborepoContent,
+    tags: ['turborepo', 'pnpm', 'monorepo', 'typescript', 'build'],
+    category: TemplateCategory.OTHER,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Turborepo',
+      frameworkVersion: '1.11+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 30,
+      copies: 12,
+      stars: 6,
+      forks: 1,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-11T00:00:00.000Z',
+    updatedAt: '2026-03-11T00:00:00.000Z',
   },
 ]
 
