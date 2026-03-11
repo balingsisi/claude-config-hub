@@ -6,796 +6,523 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Project Name**: SvelteKit Fullstack Application
 **Type**: Modern Fullstack Web Application
-**Tech Stack**: SvelteKit + TypeScript + Prisma + SQLite
-**Goal**: Production-ready fullstack application with SSR, type safety, and modern DX
+**Tech Stack**: SvelteKit + TypeScript + Prisma + SQLite/PostgreSQL
+**Goal**: Type-safe, performant fullstack application with SSR and edge deployment
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- **Framework**: SvelteKit 2.0+
-- **Language**: TypeScript 5.3+
-- **Styling**: Tailwind CSS 3.4+
-- **UI Components**: shadcn-svelte (optional)
-- **Forms**: Superforms + Zod validation
-- **Animations**: Svelte transitions
+### Core
+- **Framework**: SvelteKit 2.x
+- **Language**: TypeScript 5.x
+- **Runtime**: Node.js 20+ / Edge Runtime
+- **Build**: Vite 5.x
 
-### Backend
-- **Runtime**: Node.js / Vercel Edge / Cloudflare Workers
-- **ORM**: Prisma 5.8+
+### Data Layer
+- **ORM**: Prisma 5.x
 - **Database**: SQLite (dev) / PostgreSQL (prod)
-- **Authentication**: Lucia Auth / @auth/sveltekit
 - **Validation**: Zod
+
+### UI
+- **Styling**: Tailwind CSS 3.x
+- **Components**: shadcn-svelte
+- **Icons**: lucide-svelte
 
 ### Development
 - **Package Manager**: pnpm
-- **Testing**: Vitest + Playwright
 - **Linting**: ESLint + Prettier
-- **Git Hooks**: Husky + lint-staged
+- **Testing**: Vitest + Playwright
 
 ---
 
-## Code Standards
-
-### TypeScript Rules
-- Enable strict mode in `tsconfig.json`
-- No `any` types - use `unknown` with type guards
-- Prefer `interface` for object shapes
-- Use `satisfies` operator for type checking
-
-```typescript
-// ✅ Good
-interface User {
-  id: string
-  name: string
-  email: string
-  createdAt: Date
-}
-
-async function getUser(id: string): Promise<User | null> {
-  const user = await prisma.user.findUnique({ where: { id } })
-  return user
-}
-
-const config = {
-  apiUrl: '/api',
-  timeout: 5000
-} satisfies AppConfig
-
-// ❌ Bad
-async function getUser(id: any): any {
-  return prisma.user.findUnique({ where: { id } })
-}
-```
-
-### Naming Conventions
-- **Components**: PascalCase (`UserProfile.svelte`)
-- **Routes**: kebab-case (`/user-profile`)
-- **Server files**: +page.server.ts, +layout.server.ts
-- **Stores**: camelCase with `$` usage (`$userStore`)
-- **Types**: PascalCase (`User`, `Product`)
-- **Files**: kebab-case (`user-profile.svelte`)
-
-### SvelteKit Best Practices
-
-#### Use Load Functions
-```typescript
-// ✅ Good - Server-side data loading
-// src/routes/users/+page.server.ts
-import type { PageServerLoad } from './$types'
-import { error } from '@sveltejs/kit'
-
-export const load: PageServerLoad = async ({ locals, params }) => {
-  const users = await prisma.user.findMany()
-  
-  if (!users) {
-    throw error(404, 'Users not found')
-  }
-  
-  return { users }
-}
-
-// src/routes/users/+page.svelte
-<script lang="ts">
-  import type { PageData } from './$types'
-  
-  export let data: PageData
-</script>
-
-{#each data.users as user (user.id)}
-  <div>{user.name}</div>
-{/each}
-```
-
-#### Server Actions
-```typescript
-// ✅ Good - Form actions
-// src/routes/users/+page.server.ts
-import type { Actions } from './$types'
-import { fail, redirect } from '@sveltejs/kit'
-
-export const actions: Actions = {
-  create: async ({ request, locals }) => {
-    const formData = await request.formData()
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    
-    if (!name || !email) {
-      return fail(400, { error: 'Name and email are required' })
-    }
-    
-    await prisma.user.create({
-      data: { name, email }
-    })
-    
-    throw redirect(303, '/users')
-  }
-}
-```
-
----
-
-## Directory Structure
+## Project Structure
 
 ```
 src/
-├── routes/                    # SvelteKit routes
-│   ├── (auth)/               # Auth group routes
-│   │   ├── login/
-│   │   │   ├── +page.svelte
-│   │   │   └── +page.server.ts
-│   │   ├── register/
-│   │   └── +layout.svelte
-│   │
-│   ├── (app)/                # App group routes
-│   │   ├── dashboard/
-│   │   │   ├── +page.svelte
-│   │   │   └── +page.server.ts
-│   │   ├── users/
-│   │   │   ├── [id]/
-│   │   │   │   ├── +page.svelte
-│   │   │   │   └── +page.server.ts
-│   │   │   ├── +page.svelte
-│   │   │   └── +page.server.ts
-│   │   └── +layout.svelte
-│   │
-│   ├── api/                  # API routes
-│   │   ├── users/
-│   │   │   ├── [id]/
-│   │   │   │   └── +server.ts
-│   │   │   └── +server.ts
-│   │   └── health/
-│   │       └── +server.ts
-│   │
-│   ├── +layout.svelte        # Root layout
-│   ├── +layout.server.ts     # Root server layout
-│   ├── +page.svelte          # Home page
-│   └── +error.svelte         # Error page
-│
-├── lib/                      # Shared code
-│   ├── server/              # Server-only code
+├── lib/
+│   ├── components/
+│   │   ├── ui/              # shadcn-svelte components
+│   │   └── shared/          # Shared components
+│   ├── server/
 │   │   ├── db.ts            # Prisma client
-│   │   ├── auth.ts          # Auth utilities
-│   │   └── api.ts           # API helpers
-│   │
-│   ├── components/          # Reusable components
-│   │   ├── ui/             # UI components
-│   │   │   ├── Button.svelte
-│   │   │   ├── Input.svelte
-│   │   │   └── Modal.svelte
-│   │   ├── forms/          # Form components
-│   │   │   ├── UserForm.svelte
-│   │   │   └── SearchForm.svelte
-│   │   └── layout/         # Layout components
-│   │       ├── Header.svelte
-│   │       ├── Sidebar.svelte
-│   │       └── Footer.svelte
-│   │
-│   ├── stores/             # Svelte stores
-│   │   ├── user.ts
-│   │   ├── toast.ts
-│   │   └── theme.ts
-│   │
-│   ├── utils/              # Utility functions
+│   │   ├── auth.ts          # Authentication
+│   │   └── api.ts           # API utilities
+│   ├── utils/
 │   │   ├── format.ts
-│   │   ├── validation.ts
-│   │   └── api.ts
-│   │
-│   └── types/              # TypeScript types
-│       ├── user.ts
-│       ├── api.ts
-│       └── env.d.ts
-│
-├── params/                 # Custom param matchers
-│   └── id.ts
-│
-├── prisma/                 # Database schema
-│   ├── schema.prisma
-│   ├── seed.ts
-│   └── migrations/
-│
-├── static/                 # Static assets
-│   ├── favicon.png
-│   └── images/
-│
-├── app.html               # App template
-├── app.d.ts               # App type declarations
-└── hooks.server.ts        # Server hooks
+│   │   └── validation.ts
+│   ├── types/
+│   │   └── index.ts
+│   └── stores/
+│       └── user.ts
+├── routes/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   └── register/
+│   ├── (dashboard)/
+│   │   ├── dashboard/
+│   │   └── settings/
+│   ├── api/
+│   │   ├── users/
+│   │   └── posts/
+│   ├── +layout.svelte
+│   ├── +layout.server.ts
+│   ├── +page.svelte
+│   └── +page.server.ts
+├── app.html
+├── app.d.ts
+└── hooks.server.ts
 ```
 
 ---
 
-## Routing Patterns
+## Coding Rules
 
-### Dynamic Routes
+### 1. Server-Side Data Loading
+
+**Use +page.server.ts for data fetching:**
+
 ```typescript
-// src/routes/users/[id]/+page.server.ts
-import type { PageServerLoad } from './$types'
-import { error } from '@sveltejs/kit'
+// src/routes/posts/+page.server.ts
+import type { PageServerLoad } from './$types';
+import { db } from '$lib/server/db';
+import { error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ params }) => {
-  const user = await prisma.user.findUnique({
-    where: { id: params.id }
-  })
-  
-  if (!user) {
-    throw error(404, 'User not found')
-  }
-  
-  return { user }
-}
+export const load: PageServerLoad = async ({ locals, url }) => {
+  const page = parseInt(url.searchParams.get('page') || '1');
+  const limit = 20;
+
+  const [posts, total] = await Promise.all([
+    db.post.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        author: {
+          select: { id: true, name: true, avatar: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    }),
+    db.post.count()
+  ]);
+
+  return {
+    posts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    }
+  };
+};
 ```
 
-### Layout Groups
-```svelte
-<!-- src/routes/(app)/+layout.svelte -->
-<script lang="ts">
-  import Header from '$lib/components/layout/Header.svelte'
-  import Sidebar from '$lib/components/layout/Sidebar.svelte'
-  
-  export let data
-</script>
+### 2. Form Actions
 
-<div class="app-layout">
-  <Header user={data.user} />
-  <div class="content">
-    <Sidebar />
-    <main>
-      <slot />
-    </main>
-  </div>
-</div>
-```
+**Handle form submissions with actions:**
 
-### API Routes
 ```typescript
-// src/routes/api/users/+server.ts
-import type { RequestHandler } from './$types'
-import { json, error } from '@sveltejs/kit'
+// src/routes/posts/+page.server.ts
+import type { Actions } from './$types';
+import { fail, redirect } from '@sveltejs/kit';
+import { z } from 'zod';
+import { db } from '$lib/server/db';
 
-export const GET: RequestHandler = async ({ url }) => {
-  const page = parseInt(url.searchParams.get('page') || '1')
-  const limit = parseInt(url.searchParams.get('limit') || '10')
-  
-  const users = await prisma.user.findMany({
-    skip: (page - 1) * limit,
-    take: limit
-  })
-  
-  return json(users)
-}
-
-export const POST: RequestHandler = async ({ request }) => {
-  const body = await request.json()
-  
-  const user = await prisma.user.create({
-    data: body
-  })
-  
-  return json(user, { status: 201 })
-}
-
-// src/routes/api/users/[id]/+server.ts
-import type { RequestHandler } from './$types'
-import { json, error } from '@sveltejs/kit'
-
-export const GET: RequestHandler = async ({ params }) => {
-  const user = await prisma.user.findUnique({
-    where: { id: params.id }
-  })
-  
-  if (!user) {
-    throw error(404, 'User not found')
-  }
-  
-  return json(user)
-}
-
-export const PUT: RequestHandler = async ({ params, request }) => {
-  const body = await request.json()
-  
-  const user = await prisma.user.update({
-    where: { id: params.id },
-    data: body
-  })
-  
-  return json(user)
-}
-
-export const DELETE: RequestHandler = async ({ params }) => {
-  await prisma.user.delete({
-    where: { id: params.id }
-  })
-  
-  return json({ success: true })
-}
-```
-
----
-
-## Prisma Integration
-
-### Schema
-```prisma
-// prisma/schema.prisma
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  role      Role     @default(USER)
-  posts     Post[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("users")
-}
-
-model Post {
-  id        String   @id @default(uuid())
-  title     String
-  content   String?
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("posts")
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-```
-
-### Client Setup
-```typescript
-// src/lib/server/db.ts
-import { PrismaClient } from '@prisma/client'
-
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
-
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
-  })
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-```
-
----
-
-## Forms & Validation
-
-### Superforms Setup
-```typescript
-// src/lib/schemas/user.ts
-import { z } from 'zod'
-
-export const userSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  role: z.enum(['USER', 'ADMIN']).default('USER')
-})
-
-export type UserSchema = typeof userSchema
-
-// src/routes/users/create/+page.server.ts
-import type { PageServerLoad, Actions } from './$types'
-import { superValidate } from 'sveltekit-superforms/server'
-import { userSchema } from '$lib/schemas/user'
-import { fail, redirect } from '@sveltejs/kit'
-
-export const load: PageServerLoad = async () => {
-  const form = await superValidate(userSchema)
-  return { form }
-}
+const createPostSchema = z.object({
+  title: z.string().min(5).max(100),
+  content: z.string().min(10),
+  tags: z.array(z.string()).optional()
+});
 
 export const actions: Actions = {
-  default: async ({ request }) => {
-    const form = await superValidate(request, userSchema)
-    
-    if (!form.valid) {
-      return fail(400, { form })
+  create: async ({ request, locals }) => {
+    if (!locals.user) {
+      return fail(401, { error: 'Unauthorized' });
     }
-    
-    await prisma.user.create({
-      data: form.data
-    })
-    
-    throw redirect(303, '/users')
-  }
-}
-```
 
-### Form Component
-```svelte
-<!-- src/routes/users/create/+page.svelte -->
-<script lang="ts">
-  import SuperForm from 'sveltekit-superforms'
-  import { userSchema } from '$lib/schemas/user'
-  
-  export let data
-</script>
+    const formData = await request.formData();
+    const result = createPostSchema.safeParse(Object.fromEntries(formData));
 
-<SuperForm
-  {data.form}
-  schema={userSchema}
-  let:form
-  let:errors
-  let:constraints
->
-  <form method="POST">
-    <div>
-      <label for="name">Name</label>
-      <input
-        type="text"
-        name="name"
-        bind:value={$form.name}
-        {...constraints.name}
-      />
-      {#if errors.name}
-        <span class="error">{errors.name}</span>
-      {/if}
-    </div>
-
-    <div>
-      <label for="email">Email</label>
-      <input
-        type="email"
-        name="email"
-        bind:value={$form.email}
-        {...constraints.email}
-      />
-      {#if errors.email}
-        <span class="error">{errors.email}</span>
-      {/if}
-    </div>
-
-    <button type="submit">Create User</button>
-  </form>
-</SuperForm>
-```
-
----
-
-## Authentication
-
-### Lucia Auth Setup
-```typescript
-// src/lib/server/auth.ts
-import { Lucia } from 'lucia'
-import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
-import { prisma } from './db'
-
-const adapter = new PrismaAdapter(prisma.session, prisma.user)
-
-export const lucia = new Lucia(adapter, {
-  sessionCookie: {
-    attributes: {
-      secure: process.env.NODE_ENV === 'production'
+    if (!result.success) {
+      return fail(400, { 
+        errors: result.error.flatten().fieldErrors,
+        values: Object.fromEntries(formData)
+      });
     }
+
+    const post = await db.post.create({
+      data: {
+        ...result.data,
+        authorId: locals.user.id
+      }
+    });
+
+    throw redirect(303, `/posts/${post.id}`);
   }
-})
-
-declare module 'lucia' {
-  interface Register {
-    Lucia: typeof lucia
-    DatabaseUserAttributes: {
-      name: string
-      email: string
-      role: string
-    }
-  }
-}
-
-// src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit'
-import { lucia } from '$lib/server/auth'
-
-export const handle: Handle = async ({ event, resolve }) => {
-  const sessionId = event.cookies.get(lucia.sessionCookieName)
-  
-  if (!sessionId) {
-    event.locals.user = null
-    event.locals.session = null
-    return resolve(event)
-  }
-
-  const { session, user } = await lucia.validateSession(sessionId)
-  
-  if (session && session.fresh) {
-    const sessionCookie = lucia.createSessionCookie(session.id)
-    event.cookies.set(sessionCookie.name, sessionCookie.value, {
-      path: '.',
-      ...sessionCookie.attributes
-    })
-  }
-
-  if (!session) {
-    const sessionCookie = lucia.createBlankSessionCookie()
-    event.cookies.set(sessionCookie.name, sessionCookie.value, {
-      path: '.',
-      ...sessionCookie.attributes
-    })
-  }
-
-  event.locals.user = user
-  event.locals.session = session
-  return resolve(event)
-}
+};
 ```
 
-### Auth Guard
-```typescript
-// src/routes/(app)/+layout.server.ts
-import type { LayoutServerLoad } from './$types'
-import { redirect } from '@sveltejs/kit'
+### 3. Client-Side State
 
-export const load: LayoutServerLoad = async ({ locals }) => {
-  if (!locals.user) {
-    throw redirect(303, '/login')
-  }
-  
-  return {
-    user: locals.user
-  }
-}
-```
+**Use Svelte stores for client state:**
 
----
-
-## State Management
-
-### Svelte Stores
 ```typescript
 // src/lib/stores/user.ts
-import { writable } from 'svelte/store'
-import type { User } from '@prisma/client'
+import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
+import type { User } from '$lib/types';
 
 function createUserStore() {
-  const { subscribe, set, update } = writable<User | null>(null)
+  const { subscribe, set } = writable<User | null>(null);
 
   return {
     subscribe,
-    setUser: (user: User) => set(user),
-    clearUser: () => set(null),
-    updateUser: (data: Partial<User>) => update(user => 
-      user ? { ...user, ...data } : null
-    )
+    set,
+    logout: async () => {
+      if (browser) {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      }
+      set(null);
+    }
+  };
+}
+
+export const user = createUserStore();
+```
+
+### 4. API Routes
+
+**Create type-safe API endpoints:**
+
+```typescript
+// src/routes/api/posts/+server.ts
+import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
+import { db } from '$lib/server/db';
+
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const page = parseInt(url.searchParams.get('page') || '1');
+  const limit = 20;
+
+  const posts = await db.post.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+    where: locals.user?.role === 'admin' ? {} : { published: true }
+  });
+
+  return json({ posts });
+};
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
   }
-}
 
-export const userStore = createUserStore()
+  const data = await request.json();
+  const post = await db.post.create({
+    data: { ...data, authorId: locals.user.id }
+  });
 
-// src/lib/stores/toast.ts
-import { writable } from 'svelte/store'
+  return json(post, { status: 201 });
+};
+```
 
-interface Toast {
-  id: string
-  type: 'success' | 'error' | 'info'
-  message: string
-}
+### 5. Server Hooks
 
-function createToastStore() {
-  const { subscribe, update } = writable<Toast[]>([])
+**Handle authentication globally:**
 
-  function add(type: Toast['type'], message: string) {
-    const id = crypto.randomUUID()
-    update(toasts => [...toasts, { id, type, message }])
+```typescript
+// src/hooks.server.ts
+import type { Handle } from '@sveltejs/kit';
+import { db } from '$lib/server/db';
+import { verifyToken } from '$lib/server/auth';
+
+export const handle: Handle = async ({ event, resolve }) => {
+  const token = event.cookies.get('auth_token');
+
+  if (token) {
+    try {
+      const userId = await verifyToken(token);
+      const user = await db.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, name: true, role: true }
+      });
+
+      if (user) {
+        event.locals.user = user;
+      }
+    } catch (error) {
+      // Token invalid, clear cookie
+      event.cookies.delete('auth_token', { path: '/' });
+    }
+  }
+
+  return resolve(event);
+};
+```
+
+---
+
+## Form Handling
+
+### Enhanced Form Component
+
+```svelte
+<!-- src/lib/components/Form.svelte -->
+<script lang="ts">
+  import { enhance } from '$app/forms';
+  
+  export let action: string | undefined = undefined;
+  
+  let loading = false;
+  let errors: Record<string, string> = {};
+  
+  function handleSubmit({ data, cancel }: SubmitFunction) {
+    loading = true;
+    errors = {};
     
-    setTimeout(() => {
-      update(toasts => toasts.filter(t => t.id !== id))
-    }, 3000)
+    return async ({ result, update }) => {
+      loading = false;
+      
+      if (result.type === 'failure' && result.data?.errors) {
+        errors = result.data.errors;
+        cancel();
+      }
+      
+      await update({ reset: false });
+    };
   }
+</script>
 
-  return {
-    subscribe,
-    success: (message: string) => add('success', message),
-    error: (message: string) => add('error', message),
-    info: (message: string) => add('info', message),
-    remove: (id: string) => update(toasts => toasts.filter(t => t.id !== id))
-  }
+<form 
+  {action}
+  method="POST"
+  use:enhance={handleSubmit}
+  class="space-y-4"
+>
+  <slot {loading} {errors} />
+</form>
+```
+
+---
+
+## Validation with Zod
+
+```typescript
+// src/lib/utils/validation.ts
+import { z } from 'zod';
+
+export const schemas = {
+  register: z.object({
+    email: z.string().email('Invalid email'),
+    password: z.string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Must contain uppercase letter')
+      .regex(/[0-9]/, 'Must contain number'),
+    name: z.string().min(2).max(50)
+  }),
+
+  createPost: z.object({
+    title: z.string().min(5).max(100),
+    content: z.string().min(10),
+    tags: z.array(z.string()).max(5).optional()
+  })
+};
+
+export type RegisterInput = z.infer<typeof schemas.register>;
+export type CreatePostInput = z.infer<typeof schemas.createPost>;
+```
+
+---
+
+## Prisma Best Practices
+
+```typescript
+// src/lib/server/db.ts
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const db =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' 
+      ? ['query', 'error', 'warn']
+      : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = db;
 }
 
-export const toastStore = createToastStore()
+// Type-safe includes
+export function includeUser<T extends { select?: object }>(options?: T) {
+  return {
+    ...options,
+    include: {
+      ...options?.include,
+      user: {
+        select: { id: true, name: true, avatar: true }
+      }
+    }
+  };
+}
 ```
 
 ---
 
 ## Testing
 
-### Unit Tests with Vitest
+### Vitest Unit Tests
+
 ```typescript
 // src/lib/utils/format.test.ts
-import { describe, it, expect } from 'vitest'
-import { formatCurrency, formatDate } from './format'
-
-describe('formatCurrency', () => {
-  it('should format USD currency', () => {
-    expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56')
-  })
-
-  it('should handle zero', () => {
-    expect(formatCurrency(0, 'USD')).toBe('$0.00')
-  })
-})
+import { describe, it, expect } from 'vitest';
+import { formatDate, slugify } from './format';
 
 describe('formatDate', () => {
-  it('should format date in default format', () => {
-    const date = new Date('2024-01-15')
-    expect(formatDate(date)).toBe('January 15, 2024')
-  })
-})
+  it('formats date correctly', () => {
+    const date = new Date('2024-01-15');
+    expect(formatDate(date)).toBe('January 15, 2024');
+  });
+});
+
+describe('slugify', () => {
+  it('creates URL-safe slugs', () => {
+    expect(slugify('Hello World!')).toBe('hello-world');
+  });
+});
 ```
 
-### Component Tests
+### Playwright E2E Tests
+
 ```typescript
-// src/lib/components/ui/Button.test.ts
-import { render, fireEvent } from '@testing-library/svelte'
-import { describe, it, expect } from 'vitest'
-import Button from './Button.svelte'
+// tests/login.spec.ts
+import { test, expect } from '@playwright/test';
 
-describe('Button', () => {
-  it('should render with text', () => {
-    const { getByText } = render(Button, { props: { text: 'Click me' } })
-    expect(getByText('Click me')).toBeTruthy()
-  })
-
-  it('should handle click events', async () => {
-    const { getByRole, component } = render(Button, { 
-      props: { text: 'Click me' } 
-    })
-    
-    const mock = vi.fn()
-    component.$on('click', mock)
-    
-    await fireEvent.click(getByRole('button'))
-    expect(mock).toHaveBeenCalled()
-  })
-
-  it('should be disabled when loading', () => {
-    const { getByRole } = render(Button, { 
-      props: { text: 'Submit', loading: true } 
-    })
-    expect(getByRole('button')).toBeDisabled()
-  })
-})
-```
-
-### E2E Tests with Playwright
-```typescript
-// tests/users.spec.ts
-import { test, expect } from '@playwright/test'
-
-test.describe('Users Page', () => {
-  test('should display users list', async ({ page }) => {
-    await page.goto('/users')
-    
-    await expect(page.locator('h1')).toHaveText('Users')
-    await expect(page.locator('.user-item')).toHaveCount(10)
-  })
-
-  test('should create new user', async ({ page }) => {
-    await page.goto('/users/create')
-    
-    await page.fill('input[name="name"]', 'John Doe')
-    await page.fill('input[name="email"]', 'john@example.com')
-    await page.click('button[type="submit"]')
-    
-    await expect(page).toHaveURL('/users')
-    await expect(page.locator('.toast')).toHaveText('User created successfully')
-  })
-})
+test('user can login', async ({ page }) => {
+  await page.goto('/login');
+  
+  await page.fill('input[name="email"]', 'test@example.com');
+  await page.fill('input[name="password"]', 'password123');
+  await page.click('button[type="submit"]');
+  
+  await expect(page).toHaveURL('/dashboard');
+});
 ```
 
 ---
 
-## Performance Optimization
+## Deployment
 
-### SSR Best Practices
-- Use `load` functions for server-side data fetching
-- Cache data with `cache` option in `load`
-- Use `prerender` for static pages
+### Vercel Configuration
 
-```typescript
-// +page.server.ts
-export const load: PageServerLoad = async ({ setHeaders }) => {
-  const users = await prisma.user.findMany()
-  
-  // Cache for 5 minutes
-  setHeaders({
-    'cache-control': 'public, max-age=300'
-  })
-  
-  return { users }
-}
-
-// +layout.ts
-export const prerender = true
-export const ssr = true
-```
-
-### Client-side Optimization
-```svelte
-<script lang="ts">
-  import { onMount } from 'svelte'
-  
-  // Lazy load heavy components
-  let HeavyComponent
-  onMount(async () => {
-    HeavyComponent = (await import('./HeavyComponent.svelte')).default
-  })
-</script>
-
-{#if HeavyComponent}
-  <svelte:component this={HeavyComponent} />
-{/if}
-```
-
----
-
-## Environment Variables
-
-```typescript
-// src/lib/types/env.d.ts
-namespace NodeJS {
-  interface ProcessEnv {
-    DATABASE_URL: string
-    SESSION_SECRET: string
-    PUBLIC_API_URL: string
-    NODE_ENV: 'development' | 'production' | 'test'
+```json
+// vercel.json
+{
+  "framework": "sveltekit",
+  "regions": ["iad1", "sfo1"],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "AUTH_SECRET": "@auth_secret"
   }
 }
+```
 
-// .env.example
-DATABASE_URL="file:./dev.db"
-SESSION_SECRET="your-secret-key"
-PUBLIC_API_URL="http://localhost:5173/api"
+### Environment Variables
+
+```bash
+# .env.example
+DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
+AUTH_SECRET="your-secret-key"
+PUBLIC_APP_URL="https://myapp.com"
 ```
 
 ---
 
-## Best Practices Summary
+## Common Commands
 
-1. **Use Load Functions** - Server-side data fetching with type safety
-2. **Server Actions** - Form submissions and mutations
-3. **Prisma ORM** - Type-safe database queries
-4. **Zod Validation** - Schema validation with Superforms
-5. **Layout Groups** - Organize routes with shared layouts
-6. **Svelte Stores** - Client-side state management
-7. **Lucia Auth** - Simple, secure authentication
-8. **Testing** - Vitest for unit, Playwright for E2E
-9. **SSR** - Server-side rendering for SEO and performance
-10. **Type Safety** - Full TypeScript integration end-to-end
+```bash
+# Development
+pnpm dev
+
+# Build
+pnpm build
+
+# Preview production build
+pnpm preview
+
+# Run tests
+pnpm test
+
+# Run E2E tests
+pnpm test:e2e
+
+# Type check
+pnpm check
+
+# Lint
+pnpm lint
+
+# Generate Prisma client
+pnpm prisma generate
+
+# Run migrations
+pnpm prisma migrate dev
+
+# Open Prisma Studio
+pnpm prisma studio
+```
+
+---
+
+## SEO Best Practices
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  
+  interface Props {
+    children: Snippet;
+    title?: string;
+    description?: string;
+  }
+  
+  let { children, title = 'My App', description = 'Description' }: Props = $props();
+</script>
+
+<svelte:head>
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+</svelte:head>
+
+{@render children()}
+```
+
+---
+
+## Performance Tips
+
+1. **Use SSR for content pages** - Better SEO and initial load
+2. **Use CSR for interactive dashboards** - Smoother UX
+3. **Implement caching** - Use `@sveltejs/adapter-vercel` edge caching
+4. **Optimize images** - Use `@sveltejs/image` or CDN
+5. **Code splitting** - Automatic with SvelteKit
+
+---
+
+## Security Checklist
+
+- [ ] Use HTTPS in production
+- [ ] Validate all input with Zod
+- [ ] Sanitize user-generated content
+- [ ] Use CSRF protection (built-in with SvelteKit)
+- [ ] Rate limit API endpoints
+- [ ] Store secrets in environment variables
+- [ ] Use httpOnly cookies for auth
