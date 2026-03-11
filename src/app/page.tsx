@@ -18,7 +18,8 @@ export const metadata: Metadata = {
 }
 
 export default function HomePage() {
-  const featuredTemplates = getFeaturedTemplates().slice(0, 6)
+  const featuredTemplates = getFeaturedTemplates().slice(0, 3)
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -33,9 +34,9 @@ export default function HomePage() {
             <p className="max-w-[700px] text-lg text-muted-foreground sm:text-xl">
               发现、浏览和使用高质量的 CLAUDE.md 模板，让 Claude Code 更好地理解你的项目
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" asChild>
-                <Link href="/templates">浏览模板</Link>
+                <Link href="/templates">浏览全部模板</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="/about">了解更多</Link>
@@ -45,35 +46,70 @@ export default function HomePage() {
 
           {/* Featured Templates */}
           <div className="mx-auto grid max-w-[980px] gap-4 sm:grid-cols-2 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Next.js SaaS</CardTitle>
-                <CardDescription>全栈 SaaS 应用模板</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Next.js 15 + TypeScript + Supabase
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>React 组件库</CardTitle>
-                <CardDescription>组件开发模板</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">React 19 + TypeScript + Storybook</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>T3 Stack</CardTitle>
-                <CardDescription>全栈 TypeScript 模板</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Next.js + tRPC + Prisma + Tailwind</p>
-              </CardContent>
-            </Card>
+            {featuredTemplates.map((template) => (
+              <Link key={template.id} href={`/templates/${template.slug}`}>
+                <Card className="group h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                        {template.name}
+                      </CardTitle>
+                      {template.featured && (
+                        <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                          精选
+                        </span>
+                      )}
+                    </div>
+                    <CardDescription className="line-clamp-2">
+                      {template.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {/* Tech Stack */}
+                      <div className="flex flex-wrap gap-2">
+                        {template.techStack.framework && (
+                          <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium">
+                            {template.techStack.framework}
+                          </span>
+                        )}
+                        {template.techStack.language && (
+                          <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium">
+                            {template.techStack.language}
+                          </span>
+                        )}
+                      </div>
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1">
+                        {template.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                      {/* Stats */}
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>👁 {template.stats.views}</span>
+                        <span>📋 {template.stats.copies}</span>
+                        <span>⭐ {template.stats.stars}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          {/* Browse All Button */}
+          <div className="mx-auto max-w-[980px] text-center">
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/templates">
+                查看全部 {getFeaturedTemplates().length + 2} 个模板 →
+              </Link>
+            </Button>
           </div>
         </section>
       </main>
