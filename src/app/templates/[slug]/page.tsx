@@ -17,6 +17,7 @@ import { UserNav } from '@/components/user-nav'
 import { FavoriteButton } from '@/components/favorite-button'
 import { TemplateRating } from '@/components/template-rating'
 import { TemplateComments } from '@/components/template-comments'
+import { TemplateJsonLd } from '@/components/template-json-ld'
 
 // Markdown 渲染组件 - 使用 react-markdown + 语法高亮
 interface MarkdownContentProps {
@@ -192,6 +193,16 @@ export default function TemplateDetailPage({ params }: { params: { slug: string 
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* JSON-LD Structured Data */}
+      <TemplateJsonLd
+        name={template.name}
+        description={template.description}
+        slug={template.slug}
+        author={template.author}
+        techStack={template.techStack}
+        stats={template.stats}
+      />
+      
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">

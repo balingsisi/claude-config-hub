@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { UserNav } from '@/components/user-nav'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export function Header() {
   return (
@@ -17,6 +18,7 @@ export function Header() {
           <Link href="/about" className="text-sm font-medium hover:text-primary">
             关于
           </Link>
+          <ThemeToggle />
           <UserNav />
         </nav>
       </div>

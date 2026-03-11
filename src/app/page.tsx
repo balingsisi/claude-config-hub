@@ -17,11 +17,34 @@ export const metadata: Metadata = {
   },
 }
 
+// JSON-LD 结构化数据
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Claude Config Hub',
+  description: '发现、浏览和使用高质量的 CLAUDE.md 模板，让 Claude Code 更好地理解你的项目',
+  url: 'https://claudeconfig.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://claudeconfig.com/templates?search={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
 export default function HomePage() {
   const featuredTemplates = getFeaturedTemplates().slice(0, 3)
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      
       <Header />
 
       {/* Hero Section */}
