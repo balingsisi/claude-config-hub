@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTemplateBySlug } from '@/data/templates'
 import { templates } from '@/data/templates'
-import { cn } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -32,7 +31,8 @@ function MarkdownContent({ content }: MarkdownContentProps) {
         rehypePlugins={[rehypeHighlight]}
         components={{
           // 代码块
-          code: ({ node, inline, className, children, ...props }: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          code: ({ inline, className, children, ...props }: any) => {
             const match = /language-(\w+)/.exec(className || '')
             const language = match ? match[1] : ''
 
@@ -142,7 +142,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
 
 export default function TemplateDetailPage({ params }: { params: { slug: string } }) {
   const template = getTemplateBySlug(params.slug)
-  const [relatedTemplates, setRelatedTemplates] = React.useState(templates.slice(0, 3))
+  const [relatedTemplates] = React.useState(templates.slice(0, 3))
 
   if (!template) {
     return (

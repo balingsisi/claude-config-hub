@@ -58,7 +58,7 @@ export function UserNav() {
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    : user.email?.[0].toUpperCase() || 'U'
+    : (user.email?.[0]?.toUpperCase() || 'U')
 
   return (
     <DropdownMenu>

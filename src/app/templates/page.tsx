@@ -1,17 +1,18 @@
 'use client'
 
 import * as React from 'react'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
-import { Search, Filter, SlidersHorizontal } from 'lucide-react'
+import { Search, Filter, SlidersHorizontal, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { templates } from '@/data/templates'
-import type { Template, TemplateCategory, TemplateDifficulty } from '@/types'
+import type { Template } from '@/types'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Header } from '@/components/header-client'
+import { TemplatePreviewModal } from '@/components/template-preview-modal'
 
 // 骨架屏组件 - 使用 shadcn/ui Skeleton
 function TemplateCardSkeleton() {
@@ -40,12 +41,15 @@ function TemplateCardSkeleton() {
 // 模板卡片组件
 interface TemplateCardProps {
   template: Template
+  onPreview: (template: Template) => void
 }
 
-function TemplateCard({ template }: TemplateCardProps) {
+function TemplateCard({ template, onPreview }: TemplateCardProps) {
   const [copied, setCopied] = React.useState(false)
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     try {
       await navigator.clipboard.writeText(template.content)
       setCopied(true)
@@ -57,6 +61,12 @@ function TemplateCard({ template }: TemplateCardProps) {
       console.error('Failed to copy:', err)
       toast.error('复制失败，请重试')
     }
+  }
+
+  const handlePreview = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onPreview(template)
   }
 
   return (
@@ -143,9 +153,19 @@ function TemplateCard({ template }: TemplateCardProps) {
       </CardContent>
       <CardFooter>
         <div className="flex gap-2 w-full">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePreview}
+            className="flex-1"
+            title="预览模板内容"
+          >
+            <Eye className="mr-1 h-4 w-4" />
+            预览
+          </Button>
           <Link href={`/templates/${template.slug}`} className="flex-1">
             <Button variant="outline" className="w-full" size="sm">
-              查看详情
+              详情
             </Button>
           </Link>
           <Button
@@ -255,6 +275,15 @@ export default function TemplatesPage() {
   const [sortBy, setSortBy] = React.useState<'popular' | 'recent' | 'rating'>('popular')
   const [isSearching, setIsSearching] = React.useState(false)
   const [isInitialLoad, setIsInitialLoad] = React.useState(true)
+  
+  // 预览模态框状态
+  const [previewTemplate, setPreviewTemplate] = React.useState<Template | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false)
+
+  const handlePreview = React.useCallback((template: Template) => {
+    setPreviewTemplate(template)
+    setIsPreviewOpen(true)
+  }, [])
 
   // 初始加载完成
   React.useEffect(() => {
@@ -278,11 +307,11 @@ export default function TemplatesPage() {
     [templates]
   )
   const frameworks = React.useMemo(
-    () => Array.from(new Set(templates.map((t) => t.techStack.framework).filter(Boolean))),
+    () => Array.from(new Set(templates.map((t) => t.techStack.framework).filter((f): f is string => Boolean(f)))),
     [templates]
   )
   const languages = React.useMemo(
-    () => Array.from(new Set(templates.map((t) => t.techStack.language).filter(Boolean))),
+    () => Array.from(new Set(templates.map((t) => t.techStack.language).filter((l): l is string => Boolean(l)))),
     [templates]
   )
 
@@ -407,7 +436,7 @@ export default function TemplatesPage() {
         ) : filteredTemplates.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredTemplates.map((template) => (
-              <TemplateCard key={template.id} template={template} />
+              <TemplateCard key={template.id} template={template} onPreview={handlePreview} />
             ))}
           </div>
         ) : (
@@ -430,6 +459,13 @@ export default function TemplatesPage() {
           </div>
         )}
       </main>
+
+      {/* Preview Modal */}
+      <TemplatePreviewModal
+        template={previewTemplate}
+        open={isPreviewOpen}
+        onOpenChange={setIsPreviewOpen}
+      />
 
       {/* Footer */}
       <footer className="border-t py-6 md:py-8">

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/database'
 
 // GET /api/ratings?templateId=xxx - 获取模板的平均评分

@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Star, MessageSquare } from 'lucide-react'
+import { MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

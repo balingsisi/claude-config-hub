@@ -10,6 +10,12 @@ import { useRouter } from 'next/navigation'
 import { Header } from '@/components/header-client'
 import { toast } from 'sonner'
 
+interface TechStack {
+  framework?: string
+  language?: string
+  [key: string]: unknown
+}
+
 interface Template {
   id: string
   template: {
@@ -17,12 +23,12 @@ interface Template {
     slug: string
     name: string
     description: string
-    techStack: any
+    techStack: TechStack
   }
 }
 
 export default function FavoritesPage() {
-  const { data: session, status } = useSession()
+  const { data: _session, status } = useSession()
   const router = useRouter()
   const [favorites, setFavorites] = React.useState<Template[]>([])
   const [isLoading, setIsLoading] = React.useState(true)

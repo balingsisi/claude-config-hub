@@ -8,15 +8,18 @@ afterEach(() => {
 })
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const IntersectionObserverMock = class IntersectionObserver {
+  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
   disconnect() {}
-  observe() {}
-  takeRecords() {
+  observe(_element: Element) {}
+  takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-  unobserve() {}
-} as any
+  unobserve(_element: Element) {}
+} as unknown as typeof IntersectionObserver
+
+global.IntersectionObserver = IntersectionObserverMock
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {

@@ -55,7 +55,12 @@ export const db = {
       category: string
       submittedBy?: string
     }) => {
-      return prisma.template.create({ data })
+      return prisma.template.create({ 
+        data: {
+          ...data,
+          techStack: data.techStack as unknown as Record<string, never>
+        } 
+      })
     },
 
     updateStatus: (id: string, status: 'approved' | 'rejected') => {

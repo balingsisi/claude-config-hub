@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 import { getTemplateBySlug, templates } from '@/data/templates'
 
 // Generate static params for all templates

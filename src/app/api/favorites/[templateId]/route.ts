@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/database'
 
 // GET /api/favorites/[templateId] - 检查是否已收藏
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { templateId: string } }
 ) {
   try {

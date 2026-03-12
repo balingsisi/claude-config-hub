@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { ArrowLeft, Mail, User, Calendar, Github, Heart, Settings } from 'lucide-react'
+import { ArrowLeft, Mail, Github, Heart, Settings } from 'lucide-react'
 import { Header } from '@/components/header-client'
 import { toast } from 'sonner'
 
@@ -18,6 +18,17 @@ export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [isLoading, setIsLoading] = React.useState(false)
+
+  // 从 localStorage 获取收藏数量 - 必须在所有条件返回之前调用
+  const favoritesCount = React.useMemo(() => {
+    if (typeof window === 'undefined' || !session?.user?.id) return 0
+    try {
+      const saved = localStorage.getItem(`favorites_${session.user.id}`)
+      return saved ? JSON.parse(saved).length : 0
+    } catch {
+      return 0
+    }
+  }, [session?.user?.id])
 
   React.useEffect(() => {
     if (status === 'unauthenticated') {
@@ -54,18 +65,7 @@ export default function ProfilePage() {
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    : user.email?.[0].toUpperCase() || 'U'
-
-  // 从 localStorage 获取收藏数量
-  const favoritesCount = React.useMemo(() => {
-    if (typeof window === 'undefined') return 0
-    try {
-      const saved = localStorage.getItem(`favorites_${user.id}`)
-      return saved ? JSON.parse(saved).length : 0
-    } catch {
-      return 0
-    }
-  }, [user.id])
+    : (user.email?.[0]?.toUpperCase() || 'U')
 
   const handleSaveProfile = async () => {
     setIsLoading(true)
@@ -225,7 +225,7 @@ export default function ProfilePage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                      <Github className="h-5 w-5 text-primary" />
+                      <Github className="h-5 w-5 text-primary"/>
                     </div>
                     <div>
                       <CardTitle className="text-base">GitHub 授权设置</CardTitle>
