@@ -380,7 +380,7 @@ export default function TemplatesPage() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 container py-8">
+      <main id="main-content" className="flex-1 container py-8">
         {/* Hero Section */}
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">

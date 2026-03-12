@@ -215,7 +215,7 @@ export default function TemplateDetailPage({ params }: { params: { slug: string 
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container py-8">
+      <main id="main-content" className="flex-1 container py-8">
         <div className="max-w-4xl mx-auto">
           {/* Title Section */}
           <div className="mb-8">

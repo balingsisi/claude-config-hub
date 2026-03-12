@@ -10,7 +10,7 @@ export default function AboutPage() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 container py-12">
+      <main id="main-content" className="flex-1 container py-12">
         <div className="max-w-4xl mx-auto space-y-12">
           {/* Hero Section */}
           <div className="text-center space-y-4">

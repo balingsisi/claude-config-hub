@@ -41,7 +41,7 @@ export default function ProfilePage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 container py-12">
+        <main id="main-content" className="flex-1 container py-12">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse space-y-6">
               <div className="h-8 w-48 bg-muted rounded" />
@@ -79,7 +79,7 @@ export default function ProfilePage() {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1 container py-12">
+      <main id="main-content" className="flex-1 container py-12">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex items-center gap-4">

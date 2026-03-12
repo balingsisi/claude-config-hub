@@ -133,6 +133,9 @@ devDependencies:
   eslint-config-prettier:
     specifier: ^9.1.0
     version: 9.1.2(eslint@8.57.1)
+  eslint-plugin-jsx-a11y:
+    specifier: ^6.10.2
+    version: 6.10.2(eslint@8.57.1)
   jsdom:
     specifier: ^24.0.0
     version: 24.1.3

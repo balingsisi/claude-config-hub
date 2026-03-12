@@ -99,8 +99,10 @@ export function FavoriteButton({
       onClick={handleToggleFavorite}
       disabled={isLoading}
       className={isFavorited ? 'text-red-500 hover:text-red-600' : ''}
+      aria-label={isFavorited ? `取消收藏 ${templateName}` : `收藏 ${templateName}`}
+      aria-pressed={isFavorited}
     >
-      <Heart className={isFavorited ? 'fill-current' : ''} />
+      <Heart className={isFavorited ? 'fill-current' : ''} aria-hidden="true" />
       {showLabel && (
         <span className="ml-2">
           {isFavorited ? '已收藏' : '收藏'}

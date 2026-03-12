@@ -8,6 +8,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { locales, type Locale } from '@/i18n/config'
+import { SkipToContent } from '@/components/skip-to-content'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -135,6 +136,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <SkipToContent />
         <NextIntlClientProvider messages={messages}>
           <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

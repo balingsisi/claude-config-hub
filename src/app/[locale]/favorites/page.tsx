@@ -85,7 +85,7 @@ export default function FavoritesPage() {
     return (
       <div className="flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1 container py-12">
+        <main id="main-content" className="flex-1 container py-12">
           <div className="max-w-6xl mx-auto">
             <div className="animate-pulse">
               <div className="h-8 w-48 bg-muted rounded mb-8" />
@@ -105,7 +105,7 @@ export default function FavoritesPage() {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1 container py-12">
+      <main id="main-content" className="flex-1 container py-12">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">

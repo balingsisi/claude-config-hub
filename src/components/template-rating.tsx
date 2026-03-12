@@ -78,8 +78,8 @@ export function TemplateRating({
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center">
+    <div className="flex items-center gap-4" role="group" aria-label="模板评分">
+      <div className="flex items-center" role="radiogroup" aria-label={`当前评分: ${rating.toFixed(1)} 分, ${count} 人评分`}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -87,6 +87,9 @@ export function TemplateRating({
             disabled={!session}
             className="group"
             type="button"
+            aria-label={`${star} 星`}
+            aria-checked={userRating === star}
+            role="radio"
           >
             <Star
               className={`h-5 w-5 transition-colors ${
@@ -94,6 +97,7 @@ export function TemplateRating({
                   ? 'fill-yellow-400 text-yellow-400'
                   : 'fill-transparent text-muted-foreground group-hover:text-yellow-400/50'
               } ${!session && 'cursor-not-allowed opacity-50'}`}
+              aria-hidden="true"
             />
           </button>
         ))}
