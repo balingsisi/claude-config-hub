@@ -1,0 +1,14 @@
+{
+  "common": {
+    "siteName": "Claude Config Hub",
+    "nav": {
+      "templates": "模板库",
+      "about": "关于"
+    },
+    "language": {
+      "switch": "切换语言",
+      "zh": "中文",
+      "en": "English"
+    }
+  }
+}

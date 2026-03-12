@@ -37,6 +37,7 @@
     "lucide-react": "^0.344.0",
     "next": "^14.2.0",
     "next-auth": "^4.24.13",
+    "next-intl": "^4.8.3",
     "next-themes": "^0.3.0",
     "raw-loader": "^4.0.2",
     "react": "^18.3.0",
