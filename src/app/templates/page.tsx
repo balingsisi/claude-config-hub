@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Search, Filter, SlidersHorizontal, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -12,7 +13,22 @@ import type { Template } from '@/types'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Header } from '@/components/header-client'
-import { TemplatePreviewModal } from '@/components/template-preview-modal'
+
+// 动态导入模态框组件以优化性能
+const TemplatePreviewModal = dynamic(
+  () => import('@/components/template-preview-modal').then((mod) => mod.TemplatePreviewModal),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">加载预览...</p>
+        </div>
+      </div>
+    ),
+  }
+)
 
 // 骨架屏组件 - 使用 shadcn/ui Skeleton
 function TemplateCardSkeleton() {

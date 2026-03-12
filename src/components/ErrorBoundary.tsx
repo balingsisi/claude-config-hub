@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || <DefaultErrorFallback error={this.state.error} reset={this} />
+      return this.props.fallback || <DefaultErrorFallback error={this.state.error} resetError={() => this.setState({ hasError: false, error: null })} />
     }
 
     return this.props.children
