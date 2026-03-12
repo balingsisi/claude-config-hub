@@ -16,6 +16,11 @@ import sveltekitFullstackContent from './sveltekit-fullstack.md'
 import goMicroserviceContent from './go-microservice.md'
 import springBootApiContent from './spring-boot-api.md'
 import nextjsEcommerceContent from './nextjs-ecommerce.md'
+import reactNativeMobileContent from './react-native-mobile.md'
+import nestjsApiContent from './nestjs-api.md'
+import astroBlogContent from './astro-blog.md'
+import graphqlServerContent from './graphql-server.md'
+import denoBackendContent from './deno-backend.md'
 
 export const templates: Template[] = [
   {
@@ -492,6 +497,163 @@ export const templates: Template[] = [
     featured: true,
     createdAt: '2026-03-11T00:00:00.000Z',
     updatedAt: '2026-03-11T00:00:00.000Z',
+  },
+  {
+    id: 'react-native-mobile',
+    name: 'React Native Mobile App',
+    slug: 'react-native-mobile',
+    description: 'Cross-platform mobile application with React Native, Expo, and modern state management',
+    content: reactNativeMobileContent,
+    tags: ['react-native', 'expo', 'typescript', 'mobile', 'ios', 'android'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'React Native',
+      frameworkVersion: '0.73+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      testing: ['Jest', 'Detox', 'Maestro'],
+    },
+    stats: {
+      views: 42,
+      copies: 20,
+      stars: 10,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-12T00:00:00.000Z',
+    updatedAt: '2026-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'nestjs-api',
+    name: 'NestJS Enterprise API',
+    slug: 'nestjs-api',
+    description: 'Enterprise-grade API with NestJS, TypeORM/Prisma, JWT authentication, and scalable architecture',
+    content: nestjsApiContent,
+    tags: ['nestjs', 'typescript', 'typeorm', 'prisma', 'api', 'enterprise'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'NestJS',
+      frameworkVersion: '10+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      database: 'PostgreSQL (TypeORM/Prisma)',
+      testing: ['Jest', 'Supertest'],
+    },
+    stats: {
+      views: 40,
+      copies: 18,
+      stars: 9,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-12T00:00:00.000Z',
+    updatedAt: '2026-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'astro-blog',
+    name: 'Astro Blog & Portfolio',
+    slug: 'astro-blog',
+    description: 'Performance-optimized static site with Astro, MDX content, and excellent SEO',
+    content: astroBlogContent,
+    tags: ['astro', 'typescript', 'mdx', 'blog', 'portfolio', 'ssg'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Astro',
+      frameworkVersion: '4+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      testing: ['Vitest', 'Playwright'],
+    },
+    stats: {
+      views: 35,
+      copies: 16,
+      stars: 8,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-12T00:00:00.000Z',
+    updatedAt: '2026-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'graphql-server',
+    name: 'GraphQL Server',
+    slug: 'graphql-server',
+    description: 'Type-safe GraphQL API with Apollo Server/Yoga, DataLoader, and production-ready features',
+    content: graphqlServerContent,
+    tags: ['graphql', 'apollo', 'typescript', 'api', 'prisma', 'dataloader'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Apollo Server / Yoga',
+      frameworkVersion: '4+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      database: 'PostgreSQL (Prisma)',
+      testing: ['Vitest', 'Apollo Server Testing'],
+    },
+    stats: {
+      views: 38,
+      copies: 17,
+      stars: 9,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-12T00:00:00.000Z',
+    updatedAt: '2026-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'deno-backend',
+    name: 'Deno Backend Service',
+    slug: 'deno-backend',
+    description: 'Modern secure backend with Deno, Oak framework, and first-class TypeScript support',
+    content: denoBackendContent,
+    tags: ['deno', 'typescript', 'oak', 'api', 'security', 'modern'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Deno + Oak',
+      frameworkVersion: '1.41+',
+      language: 'TypeScript',
+      languageVersion: 'Built-in',
+      testing: ['Deno Test'],
+    },
+    stats: {
+      views: 32,
+      copies: 14,
+      stars: 7,
+      forks: 1,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-12T00:00:00.000Z',
+    updatedAt: '2026-03-12T00:00:00.000Z',
   },
 ]
 
