@@ -4,6 +4,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  basePath: '/claude-config-hub',
   reactStrictMode: true,
   swcMinify: true,
 
