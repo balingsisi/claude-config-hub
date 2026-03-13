@@ -21,6 +21,10 @@ import nestjsApiContent from './nestjs-api.md'
 import astroBlogContent from './astro-blog.md'
 import graphqlServerContent from './graphql-server.md'
 import denoBackendContent from './deno-backend.md'
+import kubernetesDeploymentContent from './kubernetes-deployment.md'
+import githubActionsCiContent from './github-actions-ci.md'
+import electronDesktopContent from './electron-desktop.md'
+import mlPipelineContent from './ml-pipeline.md'
 
 export const templates: Template[] = [
   {
@@ -654,6 +658,128 @@ export const templates: Template[] = [
     featured: false,
     createdAt: '2026-03-12T00:00:00.000Z',
     updatedAt: '2026-03-12T00:00:00.000Z',
+  },
+  {
+    id: 'kubernetes-deployment',
+    name: 'Kubernetes Production Deployment',
+    slug: 'kubernetes-deployment',
+    description: 'Production-ready Kubernetes deployment with best practices, monitoring, and security',
+    content: kubernetesDeploymentContent,
+    tags: ['kubernetes', 'docker', 'helm', 'devops', 'deployment', 'infrastructure'],
+    category: TemplateCategory.DEVOPS,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Kubernetes',
+      frameworkVersion: '1.28+',
+      language: 'YAML',
+      testing: ['kubeval', 'conftest'],
+    },
+    stats: {
+      views: 45,
+      copies: 22,
+      stars: 12,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-13T00:00:00.000Z',
+    updatedAt: '2026-03-13T00:00:00.000Z',
+  },
+  {
+    id: 'github-actions-ci',
+    name: 'GitHub Actions CI/CD Pipeline',
+    slug: 'github-actions-ci',
+    description: 'Production-ready CI/CD pipeline with automated testing, security scanning, and deployments',
+    content: githubActionsCiContent,
+    tags: ['github-actions', 'ci-cd', 'devops', 'testing', 'deployment', 'automation'],
+    category: TemplateCategory.DEVOPS,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'GitHub Actions',
+      frameworkVersion: 'N/A',
+      language: 'YAML',
+      testing: ['Vitest', 'Playwright', 'Codecov'],
+    },
+    stats: {
+      views: 48,
+      copies: 24,
+      stars: 13,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-13T00:00:00.000Z',
+    updatedAt: '2026-03-13T00:00:00.000Z',
+  },
+  {
+    id: 'electron-desktop',
+    name: 'Electron Desktop Application',
+    slug: 'electron-desktop',
+    description: 'Production-ready desktop app with auto-updates, native features, and cross-platform support',
+    content: electronDesktopContent,
+    tags: ['electron', 'react', 'typescript', 'desktop', 'cross-platform', 'native'],
+    category: TemplateCategory.DESKTOP,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Electron',
+      frameworkVersion: '28+',
+      language: 'TypeScript',
+      languageVersion: '5.3+',
+      testing: ['Vitest', 'Playwright', 'Spectron'],
+    },
+    stats: {
+      views: 40,
+      copies: 20,
+      stars: 10,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-13T00:00:00.000Z',
+    updatedAt: '2026-03-13T00:00:00.000Z',
+  },
+  {
+    id: 'ml-pipeline',
+    name: 'Machine Learning Pipeline Service',
+    slug: 'ml-pipeline',
+    description: 'Production-ready ML service with training, inference, and monitoring capabilities',
+    content: mlPipelineContent,
+    tags: ['python', 'fastapi', 'pytorch', 'machine-learning', 'ml', 'ai'],
+    category: TemplateCategory.ML,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'FastAPI + PyTorch',
+      frameworkVersion: '0.109+ / 2.0+',
+      language: 'Python',
+      languageVersion: '3.11+',
+      testing: ['pytest', 'pytest-asyncio'],
+    },
+    stats: {
+      views: 52,
+      copies: 26,
+      stars: 15,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-13T00:00:00.000Z',
+    updatedAt: '2026-03-13T00:00:00.000Z',
   },
 ]
 
