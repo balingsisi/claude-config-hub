@@ -207,7 +207,7 @@ describe('sortByRelevance', () => {
     const project = { language: 'TypeScript' }
     const result = sortByRelevance(templates, project)
 
-    expect(result[0].id).toBe('2') // TypeScript match should be first
+    expect(result[0]!.id).toBe('2') // TypeScript match should be first
   })
 
   it('should return same number of templates', () => {
@@ -267,7 +267,7 @@ describe('getRecommendations', () => {
 
     // Template 2 has 70% match (30 + 40), which is > 30% threshold
     expect(result.length).toBe(1)
-    expect(result[0].template.id).toBe('2')
+    expect(result[0]!.template.id).toBe('2')
   })
 
   it('should filter out templates with less than 30% match', () => {
@@ -280,7 +280,7 @@ describe('getRecommendations', () => {
 
     // Template 2 has 70% match (framework + language), template 1 has 0%
     expect(result.length).toBe(1)
-    expect(result[0].template.id).toBe('2')
+    expect(result[0]!.template.id).toBe('2')
   })
 
   it('should include match percentage in result', () => {
@@ -290,7 +290,7 @@ describe('getRecommendations', () => {
 
     expect(result[0]).toHaveProperty('matchPercentage')
     // 40 + 30 + 20 = 90
-    expect(result[0].matchPercentage).toBe(90)
+    expect(result[0]!.matchPercentage).toBe(90)
   })
 
   it('should include score in result', () => {
@@ -299,7 +299,7 @@ describe('getRecommendations', () => {
     const result = getRecommendations(project, templates, 5)
 
     expect(result[0]).toHaveProperty('score')
-    expect(result[0].score).toBe(40)
+    expect(result[0]!.score).toBe(40)
   })
 
   it('should default to 5 recommendations', () => {
@@ -344,7 +344,7 @@ describe('getRecommendations', () => {
     // Template 2: 70%, Template 3: 30%, Template 1: 0% (filtered out)
     expect(result.length).toBeGreaterThan(0)
     if (result.length > 1) {
-      expect(result[0].score).toBeGreaterThanOrEqual(result[1].score)
+      expect(result[0]!.score).toBeGreaterThanOrEqual(result[1]!.score)
     }
   })
 
