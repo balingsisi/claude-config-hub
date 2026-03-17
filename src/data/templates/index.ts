@@ -29,6 +29,10 @@ import redwoodjsFullstackContent from './redwoodjs-fullstack.md'
 import tauriDesktopContent from './tauri-desktop.md'
 import gatsbyStaticContent from './gatsby-static.md'
 import nxMonorepoContent from './nx-monorepo.md'
+import sstServerlessContent from './sst-serverless.md'
+import daisyuiContent from './daisyui.md'
+import reactNativePaperContent from './react-native-paper.md'
+import typeboxValidationContent from './typebox-validation.md'
 
 export const templates: Template[] = [
   {
@@ -907,6 +911,130 @@ export const templates: Template[] = [
     },
     status: TemplateStatus.PUBLISHED,
     featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'sst-serverless',
+    name: 'SST Serverless Stack',
+    slug: 'sst-serverless',
+    description: 'Modern AWS serverless framework with Live Lambda Development and TypeScript-first configuration',
+    content: sstServerlessContent,
+    tags: ['sst', 'serverless', 'aws', 'lambda', 'typescript', 'cdk'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'SST',
+      frameworkVersion: '2.x / Ion',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 45,
+      copies: 22,
+      stars: 12,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'daisyui',
+    name: 'DaisyUI Components',
+    slug: 'daisyui',
+    description: 'Beautiful Tailwind CSS component library with semantic classes and built-in dark mode support',
+    content: daisyuiContent,
+    tags: ['daisyui', 'tailwind', 'components', 'ui', 'typescript', 'react'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.BEGINNER,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'DaisyUI',
+      frameworkVersion: '4.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Testing Library'],
+    },
+    stats: {
+      views: 52,
+      copies: 26,
+      stars: 15,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'react-native-paper',
+    name: 'React Native Paper App',
+    slug: 'react-native-paper',
+    description: 'Material Design React Native app with Paper UI components and cross-platform support',
+    content: reactNativePaperContent,
+    tags: ['react-native', 'paper', 'material-design', 'mobile', 'ios', 'android'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'React Native Paper',
+      frameworkVersion: '5.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Jest', 'React Native Testing Library', 'Detox'],
+    },
+    stats: {
+      views: 48,
+      copies: 24,
+      stars: 13,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'typebox-validation',
+    name: 'TypeBox Validation System',
+    slug: 'typebox-validation',
+    description: 'JSON Schema type builder with static type resolution for TypeScript runtime validation',
+    content: typeboxValidationContent,
+    tags: ['typebox', 'validation', 'json-schema', 'typescript', 'api', 'schema'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'TypeBox',
+      frameworkVersion: '0.31+',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 38,
+      copies: 19,
+      stars: 10,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
     createdAt: '2026-03-17T00:00:00.000Z',
     updatedAt: '2026-03-17T00:00:00.000Z',
   },
