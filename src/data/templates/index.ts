@@ -41,6 +41,10 @@ import nativewindContent from './nativewind.md'
 import reanimated3Content from './reanimated-3.md'
 import mmkvStorageContent from './mmkv-storage.md'
 import skiaGraphicsContent from './skia-graphics.md'
+import rxjsContent from './rxjs.md'
+import taroContent from './taro.md'
+import fakerjsContent from './fakerjs.md'
+import cesiumContent from './cesium.md'
 
 export const templates: Template[] = [
   {
@@ -1164,6 +1168,130 @@ export const templates: Template[] = [
       copies: 21,
       stars: 11,
       forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'rxjs',
+    name: 'RxJS Reactive Programming',
+    slug: 'rxjs',
+    description: 'Reactive Extensions for JavaScript - compose asynchronous and event-based programs using observables',
+    content: rxjsContent,
+    tags: ['rxjs', 'observables', 'reactive', 'async', 'events', 'streams', 'operators'],
+    category: TemplateCategory.TOOLING,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'RxJS',
+      frameworkVersion: '7.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 85,
+      copies: 42,
+      stars: 21,
+      forks: 6,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'taro',
+    name: 'Taro Cross-Platform Framework',
+    slug: 'taro',
+    description: 'Build once, run everywhere - WeChat Mini Program, H5, React Native, and more with a single codebase',
+    content: taroContent,
+    tags: ['taro', 'cross-platform', 'mini-program', 'wechat', 'h5', 'react-native', 'mobile'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Taro',
+      frameworkVersion: '3.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 92,
+      copies: 46,
+      stars: 23,
+      forks: 7,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'fakerjs',
+    name: 'Faker.js Test Data Generator',
+    slug: 'fakerjs',
+    description: 'Generate massive amounts of fake data for testing and development - users, products, orders, and more',
+    content: fakerjsContent,
+    tags: ['faker', 'testing', 'mock', 'data-generation', 'seed', 'factories', 'fixtures'],
+    category: TemplateCategory.TOOLING,
+    difficulty: TemplateDifficulty.BEGINNER,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Faker.js',
+      frameworkVersion: '8.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 78,
+      copies: 39,
+      stars: 19,
+      forks: 5,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'cesium',
+    name: 'Cesium 3D Geospatial Visualization',
+    slug: 'cesium',
+    description: 'Create world-class 3D globes and maps with terrain, imagery, 3D tiles, and geospatial data',
+    content: cesiumContent,
+    tags: ['cesium', '3d', 'gis', 'geospatial', 'maps', 'globe', 'terrain', 'visualization'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'CesiumJS',
+      frameworkVersion: '1.110+',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 88,
+      copies: 44,
+      stars: 22,
+      forks: 6,
     },
     status: TemplateStatus.PUBLISHED,
     featured: true,
