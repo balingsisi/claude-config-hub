@@ -1,76 +1,99 @@
-# Headless UI 无样式组件库
+# Headless UI 模板
 
 ## 技术栈
 
-- **Headless UI** - 无样式 UI 组件
-- **React 18+** - UI 框架
-- **Tailwind CSS** - 样式框架（推荐）
-- **TypeScript** - 类型安全
-- **Framer Motion** - 动画（可选）
+### 核心技术
+- **Headless UI**: Tailwind CSS 团队的无样式 UI 组件库
+- **React / Vue**: 支持 React 18+ 和 Vue 3
+- **Tailwind CSS**: 实用优先的 CSS 框架
+- **Framer Motion**: 动画库（可选）
+- **Heroicons / Lucide**: 图标库
+
+### 开发工具
+- **TypeScript**: 类型安全
+- **@headlessui/react**: React 组件
+- **@headlessui/tailwindcss**: Tailwind 插件
+- **clsx / tailwind-merge**: 类名工具
 
 ## 项目结构
 
 ```
-src/
-├── components/
-│   ├── ui/                    # Headless UI 封装
-│   │   ├── Menu.tsx           # 下拉菜单
-│   │   ├── Listbox.tsx        # 选择框
-│   │   ├── Combobox.tsx       # 组合框
-│   │   ├── Dialog.tsx         # 模态框
-│   │   ├── Disclosure.tsx     # 折叠面板
-│   │   ├── Popover.tsx        # 弹出框
-│   │   ├── RadioGroup.tsx     # 单选组
-│   │   ├── Switch.tsx         # 开关
-│   │   ├── Tab.tsx            # 标签页
-│   │   └── Transition.tsx     # 过渡动画
-│   ├── forms/                 # 表单组件
-│   │   ├── Select.tsx
-│   │   ├── Autocomplete.tsx
-│   │   └── Toggle.tsx
-│   ├── modals/                # 模态框
-│   │   ├── ConfirmDialog.tsx
-│   │   └── AlertDialog.tsx
-│   └── navigation/            # 导航组件
-│       ├── Dropdown.tsx
-│       └── MegaMenu.tsx
-├── hooks/
-│   └── useFloatingUI.ts       # 定位工具
-└── App.tsx
+headless-ui-project/
+├── src/
+│   ├── components/
+│   │   ├── ui/                    # Headless UI 封装
+│   │   │   ├── Menu.tsx           # 下拉菜单
+│   │   │   ├── Listbox.tsx        # 列表选择框
+│   │   │   ├── Combobox.tsx       # 组合框
+│   │   │   ├── Dialog.tsx         # 对话框
+│   │   │   ├── Disclosure.tsx     # 折叠面板
+│   │   │   ├── Popover.tsx        # 弹出框
+│   │   │   ├── Tab.tsx            # 标签页
+│   │   │   ├── RadioGroup.tsx     # 单选组
+│   │   │   ├── Switch.tsx         # 开关
+│   │   │   ├── Transition.tsx     # 过渡动画
+│   │   │   └── FocusTrap.tsx      # 焦点捕获
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── MobileMenu.tsx
+│   │   └── forms/
+│   │       ├── SearchCombobox.tsx
+│   │       ├── CountrySelect.tsx
+│   │       └── SettingsForm.tsx
+│   ├── hooks/
+│   │   ├── useClickOutside.ts
+│   │   └── useKeyNavigation.ts
+│   ├── lib/
+│   │   └── utils.ts
+│   └── app/
+│       ├── layout.tsx
+│       └── page.tsx
+├── tailwind.config.js
+├── package.json
+└── tsconfig.json
 ```
 
-## 核心概念
+## 代码模式
 
-### 1. Menu 下拉菜单
+### 1. 下拉菜单 (components/ui/Menu.tsx)
 
-```tsx
-// components/ui/Menu.tsx
-import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+```typescript
+'use client'
 
-interface MenuOption {
-  id: string;
-  label: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  disabled?: boolean;
-  onClick?: () => void;
+import { Fragment } from 'react'
+import { Menu, Transition } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { cn } from '@/lib/utils'
+
+interface MenuItem {
+  label: string
+  onClick?: () => void
+  icon?: React.ReactNode
+  disabled?: boolean
+  danger?: boolean
 }
 
-interface DropdownMenuProps {
-  button: React.ReactNode;
-  items: MenuOption[];
-  className?: string;
+interface MenuDropdownProps {
+  items: MenuItem[]
+  trigger: React.ReactNode
+  className?: string
 }
 
-export function DropdownMenu({ button, items, className }: DropdownMenuProps) {
+export function MenuDropdown({
+  items,
+  trigger,
+  className,
+}: MenuDropdownProps) {
   return (
-    <Menu as="div" className={`relative ${className}`}>
-      <MenuButton className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        {button}
-        <ChevronDownIcon className="h-4 w-4" />
-      </MenuButton>
+    <Menu as="div" className={cn('relative inline-block text-left', className)}>
+      <Menu.Button className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50">
+        {trigger}
+        <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+      </Menu.Button>
 
       <Transition
+        as={Fragment}
         enter="transition ease-out duration-100"
         enterFrom="transform opacity-0 scale-95"
         enterTo="transform opacity-100 scale-100"
@@ -78,247 +101,320 @@ export function DropdownMenu({ button, items, className }: DropdownMenuProps) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-          {items.map((item) => (
-            <MenuItem key={item.id} disabled={item.disabled}>
-              {({ active, disabled }) => (
-                <button
-                  onClick={item.onClick}
-                  className={`
-                    group flex w-full items-center gap-2 px-4 py-2 text-sm
-                    ${active ? 'bg-blue-500 text-white' : 'text-gray-700'}
-                    ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                  `}
-                >
-                  {item.icon && <item.icon className="h-5 w-5" />}
-                  {item.label}
-                </button>
-              )}
-            </MenuItem>
-          ))}
-        </MenuItems>
+        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+          <div className="p-1">
+            {items.map((item, index) => (
+              <Menu.Item key={index} disabled={item.disabled}>
+                {({ active, disabled }) => (
+                  <button
+                    onClick={item.onClick}
+                    disabled={disabled}
+                    className={cn(
+                      'group flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm',
+                      active && 'bg-gray-100',
+                      disabled && 'opacity-50 cursor-not-allowed',
+                      item.danger && 'text-red-600',
+                      !item.danger && 'text-gray-900'
+                    )}
+                  >
+                    {item.icon && (
+                      <span className="h-5 w-5 opacity-60">{item.icon}</span>
+                    )}
+                    {item.label}
+                  </button>
+                )}
+              </Menu.Item>
+            ))}
+          </div>
+        </Menu.Items>
       </Transition>
     </Menu>
-  );
+  )
 }
 
 // 使用示例
-function App() {
-  const menuItems = [
-    { id: 'edit', label: 'Edit', onClick: () => console.log('Edit') },
-    { id: 'duplicate', label: 'Duplicate', onClick: () => console.log('Duplicate') },
-    { id: 'archive', label: 'Archive', onClick: () => console.log('Archive') },
-    { id: 'delete', label: 'Delete', onClick: () => console.log('Delete') },
-  ];
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 
+function Example() {
   return (
-    <DropdownMenu button="Options" items={menuItems} />
-  );
+    <MenuDropdown
+      trigger="Options"
+      items={[
+        { label: 'Edit', icon: <PencilIcon />, onClick: () => {} },
+        { label: 'Delete', icon: <TrashIcon />, danger: true, onClick: () => {} },
+      ]}
+    />
+  )
 }
 ```
 
-### 2. Listbox 选择框
+### 2. 列表选择框 (components/ui/Listbox.tsx)
 
-```tsx
-// components/ui/Listbox.tsx
-import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+```typescript
+'use client'
 
-interface SelectOption {
-  id: string;
-  name: string;
-  avatar?: string;
-  disabled?: boolean;
+import { Fragment } from 'react'
+import { Listbox, Transition } from '@headlessui/react'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { cn } from '@/lib/utils'
+
+interface Option {
+  id: string | number
+  name: string
+  description?: string
+  icon?: React.ReactNode
+  disabled?: boolean
 }
 
-interface CustomSelectProps {
-  value: SelectOption;
-  onChange: (value: SelectOption) => void;
-  options: SelectOption[];
-  label?: string;
-  placeholder?: string;
+interface ListboxSelectProps {
+  value: Option
+  onChange: (value: Option) => void
+  options: Option[]
+  label?: string
+  className?: string
 }
 
-export function CustomSelect({
+export function ListboxSelect({
   value,
   onChange,
   options,
   label,
-  placeholder = 'Select...',
-}: CustomSelectProps) {
+  className,
+}: ListboxSelectProps) {
   return (
     <Listbox value={value} onChange={onChange}>
-      {label && (
-        <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-        </Listbox.Label>
-      )}
-      <div className="relative">
-        <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-2 pl-3 pr-10 text-left shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm">
-          <span className={value ? 'block truncate' : 'block truncate text-gray-400'}>
-            {value?.name || placeholder}
-          </span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-          </span>
-        </ListboxButton>
+      {({ open }) => (
+        <div className={cn('relative', className)}>
+          {label && (
+            <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </Listbox.Label>
+          )}
+          <div className="relative">
+            <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-white py-2.5 pl-3 pr-10 text-left shadow-sm ring-1 ring-gray-200 focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm">
+              <span className="flex items-center gap-2">
+                {value.icon && <span className="h-5 w-5">{value.icon}</span>}
+                <span className="block truncate">{value.name}</span>
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
+              </span>
+            </Listbox.Button>
 
-        <Transition
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-            {options.map((option) => (
-              <ListboxOption
-                key={option.id}
-                value={option}
-                disabled={option.disabled}
-                className={({ active, selected }) =>
-                  `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                    active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                  } ${option.disabled ? 'opacity-50 cursor-not-allowed' : ''}`
-                }
-              >
-                {({ selected }) => (
-                  <>
-                    {option.avatar && (
-                      <img
-                        src={option.avatar}
-                        alt=""
-                        className="h-6 w-6 flex-shrink-0 rounded-full"
-                      />
+            <Transition
+              show={open}
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                {options.map((option) => (
+                  <Listbox.Option
+                    key={option.id}
+                    value={option}
+                    disabled={option.disabled}
+                    className={({ active, selected }) =>
+                      cn(
+                        'relative cursor-pointer select-none py-2 pl-3 pr-9',
+                        active && 'bg-gray-100',
+                        option.disabled && 'opacity-50 cursor-not-allowed'
+                      )
+                    }
+                  >
+                    {({ selected }) => (
+                      <>
+                        <div className="flex items-center gap-2">
+                          {option.icon && (
+                            <span className="h-5 w-5">{option.icon}</span>
+                          )}
+                          <div>
+                            <span
+                              className={cn(
+                                'block truncate',
+                                selected && 'font-semibold'
+                              )}
+                            >
+                              {option.name}
+                            </span>
+                            {option.description && (
+                              <span className="block text-xs text-gray-500">
+                                {option.description}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {selected && (
+                          <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
+                            <CheckIcon className="h-5 w-5" />
+                          </span>
+                        )}
+                      </>
                     )}
-                    <span className={`block truncate ${selected ? 'font-semibold' : ''}`}>
-                      {option.name}
-                    </span>
-                    {selected && (
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-4">
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </ListboxOption>
-            ))}
-          </ListboxOptions>
-        </Transition>
-      </div>
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </div>
+      )}
     </Listbox>
-  );
+  )
 }
 ```
 
-### 3. Combobox 组合框
+### 3. 组合框/搜索框 (components/ui/Combobox.tsx)
 
-```tsx
-// components/ui/Combobox.tsx
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
-import { useState, useMemo } from 'react';
+```typescript
+'use client'
 
-interface AutocompleteOption {
-  id: string;
-  name: string;
+import { Fragment, useState, useEffect } from 'react'
+import { Combobox, Transition } from '@headlessui/react'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { cn } from '@/lib/utils'
+
+interface ComboboxSearchProps<T> {
+  value: T | null
+  onChange: (value: T) => void
+  options: T[]
+  displayValue: (option: T) => string
+  filterFn?: (query: string, options: T[]) => T[]
+  placeholder?: string
+  label?: string
+  className?: string
 }
 
-interface AutocompleteProps {
-  value: AutocompleteOption | null;
-  onChange: (value: AutocompleteOption | null) => void;
-  options: AutocompleteOption[];
-  placeholder?: string;
-  displayValue?: (option: AutocompleteOption) => string;
-}
-
-export function Autocomplete({
+export function ComboboxSearch<T extends { id: string | number }>({
   value,
   onChange,
   options,
+  displayValue,
+  filterFn,
   placeholder = 'Search...',
-  displayValue = (option) => option.name,
-}: AutocompleteProps) {
-  const [query, setQuery] = useState('');
+  label,
+  className,
+}: ComboboxSearchProps<T>) {
+  const [query, setQuery] = useState('')
+  const [filtered, setFiltered] = useState(options)
 
-  const filteredOptions = useMemo(() => {
-    if (!query) return options;
-    return options.filter((option) =>
-      option.name.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [options, query]);
+  useEffect(() => {
+    if (!query) {
+      setFiltered(options)
+      return
+    }
+
+    if (filterFn) {
+      setFiltered(filterFn(query, options))
+    } else {
+      const lowerQuery = query.toLowerCase()
+      setFiltered(
+        options.filter((option) =>
+          displayValue(option).toLowerCase().includes(lowerQuery)
+        )
+      )
+    }
+  }, [query, options, filterFn, displayValue])
 
   return (
     <Combobox value={value} onChange={onChange} nullable>
-      <div className="relative">
-        <div className="relative w-full">
-          <ComboboxInput
-            className="w-full rounded-md border-0 bg-white py-2 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm"
-            displayValue={displayValue}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={placeholder}
-          />
-          <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-          </ComboboxButton>
-        </div>
+      {({ open }) => (
+        <div className={cn('relative', className)}>
+          {label && (
+            <Combobox.Label className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </Combobox.Label>
+          )}
+          <div className="relative">
+            <div className="relative w-full">
+              <Combobox.Input
+                className="w-full rounded-lg border-0 bg-white py-2.5 pl-3 pr-10 shadow-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm"
+                displayValue={(item: T | null) => (item ? displayValue(item) : '')}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={placeholder}
+              />
+              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
+              </Combobox.Button>
+            </div>
 
-        <Transition
-          leave="transition ease-in duration-100"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-          afterLeave={() => setQuery('')}
-        >
-          <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-            {filteredOptions.length === 0 && query !== '' ? (
-              <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                Nothing found.
-              </div>
-            ) : (
-              filteredOptions.map((option) => (
-                <ComboboxOption
-                  key={option.id}
-                  value={option}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                      active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                    }`
-                  }
-                >
-                  {({ selected }) => (
-                    <>
-                      <span className={`block truncate ${selected ? 'font-medium' : ''}`}>
-                        {option.name}
-                      </span>
-                      {selected && (
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-4">
-                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                        </span>
+            <Transition
+              show={open}
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+            >
+              <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                {filtered.length === 0 && query !== '' ? (
+                  <div className="relative cursor-pointer select-none px-4 py-2 text-gray-700">
+                    Nothing found.
+                  </div>
+                ) : (
+                  filtered.map((option) => (
+                    <Combobox.Option
+                      key={option.id}
+                      value={option}
+                      className={({ active }) =>
+                        cn(
+                          'relative cursor-pointer select-none py-2 pl-3 pr-9',
+                          active && 'bg-gray-100'
+                        )
+                      }
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span
+                            className={cn(
+                              'block truncate',
+                              selected && 'font-semibold'
+                            )}
+                          >
+                            {displayValue(option)}
+                          </span>
+                          {selected && (
+                            <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
+                              <CheckIcon className="h-5 w-5" />
+                            </span>
+                          )}
+                        </>
                       )}
-                    </>
-                  )}
-                </ComboboxOption>
-              ))
-            )}
-          </ComboboxOptions>
-        </Transition>
-      </div>
+                    </Combobox.Option>
+                  ))
+                )}
+              </Combobox.Options>
+            </Transition>
+          </div>
+        </div>
+      )}
     </Combobox>
-  );
+  )
 }
 ```
 
-### 4. Dialog 模态框
+### 4. 对话框/模态框 (components/ui/Dialog.tsx)
 
-```tsx
-// components/ui/Dialog.tsx
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+```typescript
+'use client'
+
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { cn } from '@/lib/utils'
 
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-  children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  isOpen: boolean
+  onClose: () => void
+  title?: string
+  description?: string
+  children: React.ReactNode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  className?: string
 }
 
 const sizeClasses = {
@@ -327,13 +423,22 @@ const sizeClasses = {
   lg: 'max-w-lg',
   xl: 'max-w-xl',
   full: 'max-w-4xl',
-};
+}
 
-export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  description,
+  children,
+  size = 'md',
+  className,
+}: ModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <TransitionChild
+        {/* 背景遮罩 */}
+        <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -342,12 +447,12 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <DialogBackdrop className="fixed inset-0 bg-black/50" />
-        </TransitionChild>
+          <div className="fixed inset-0 bg-black/25 backdrop-blur-sm" />
+        </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <TransitionChild
+            <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -356,560 +461,336 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all`}>
+              <Dialog.Panel
+                className={cn(
+                  'w-full transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all',
+                  sizeClasses[size],
+                  className
+                )}
+              >
+                {/* 关闭按钮 */}
+                <div className="absolute right-4 top-4">
+                  <button
+                    type="button"
+                    className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                    onClick={onClose}
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* 标题 */}
                 {title && (
-                  <div className="flex items-center justify-between mb-4">
-                    <DialogTitle className="text-lg font-semibold text-gray-900">
+                  <div className="px-6 pt-6">
+                    <Dialog.Title className="text-lg font-semibold text-gray-900">
                       {title}
-                    </DialogTitle>
-                    <button
-                      onClick={onClose}
-                      className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
-                    >
-                      <XMarkIcon className="h-6 w-6" />
-                    </button>
+                    </Dialog.Title>
+                    {description && (
+                      <Dialog.Description className="mt-2 text-sm text-gray-500">
+                        {description}
+                      </Dialog.Description>
+                    )}
                   </div>
                 )}
-                {children}
-              </DialogPanel>
-            </TransitionChild>
+
+                {/* 内容 */}
+                <div className="p-6">{children}</div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
       </Dialog>
     </Transition>
-  );
+  )
 }
 
 // 使用示例
-function ConfirmDialog({ isOpen, onClose, onConfirm }: {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}) {
+function Example() {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Confirm Action" size="sm">
-      <p className="text-gray-600 mb-6">
-        Are you sure you want to proceed? This action cannot be undone.
-      </p>
-      <div className="flex justify-end gap-3">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-        >
-          Confirm
-        </button>
-      </div>
-    </Modal>
-  );
+    <>
+      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Delete Item"
+        description="This action cannot be undone."
+      >
+        <p>Are you sure you want to delete this item?</p>
+        <div className="mt-4 flex gap-2 justify-end">
+          <button onClick={() => setIsOpen(false)}>Cancel</button>
+          <button className="bg-red-500 text-white px-4 py-2 rounded">
+            Delete
+          </button>
+        </div>
+      </Modal>
+    </>
+  )
 }
 ```
 
-### 5. Tab 标签页
+### 5. 标签页 (components/ui/Tab.tsx)
 
-```tsx
-// components/ui/Tab.tsx
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+```typescript
+'use client'
+
+import { Tab } from '@headlessui/react'
+import { cn } from '@/lib/utils'
 
 interface TabItem {
-  id: string;
-  label: string;
-  content: React.ReactNode;
-  disabled?: boolean;
+  label: string
+  content: React.ReactNode
+  icon?: React.ReactNode
+  disabled?: boolean
 }
 
 interface TabsProps {
-  tabs: TabItem[];
-  defaultIndex?: number;
-  onChange?: (index: number) => void;
-  variant?: 'default' | 'pills' | 'bordered';
+  tabs: TabItem[]
+  defaultIndex?: number
+  onChange?: (index: number) => void
+  variant?: 'line' | 'pills'
+  className?: string
 }
 
-export function Tabs({ tabs, defaultIndex = 0, onChange, variant = 'default' }: TabsProps) {
+export function Tabs({
+  tabs,
+  defaultIndex = 0,
+  onChange,
+  variant = 'line',
+  className,
+}: TabsProps) {
   return (
-    <TabGroup defaultIndex={defaultIndex} onChange={onChange}>
-      <TabList className={`
-        flex gap-2
-        ${variant === 'default' ? 'border-b border-gray-200' : ''}
-        ${variant === 'pills' ? 'bg-gray-100 p-1 rounded-lg' : ''}
-        ${variant === 'bordered' ? 'bg-white rounded-t-lg border border-b-0 border-gray-200 p-1' : ''}
-      `}>
-        {tabs.map((tab) => (
+    <Tab.Group defaultIndex={defaultIndex} onChange={onChange}>
+      <Tab.List
+        className={cn(
+          'flex',
+          variant === 'line' && 'border-b border-gray-200',
+          variant === 'pills' && 'gap-2 rounded-lg bg-gray-100 p-1',
+          className
+        )}
+      >
+        {tabs.map((tab, index) => (
           <Tab
-            key={tab.id}
+            key={index}
             disabled={tab.disabled}
-            className={({ selected }) => `
-              px-4 py-2 text-sm font-medium outline-none transition-colors
-              ${variant === 'default' ? `
-                -mb-px border-b-2
-                ${selected ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-              ` : ''}
-              ${variant === 'pills' ? `
-                rounded-md
-                ${selected ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:text-gray-800'}
-              ` : ''}
-              ${variant === 'bordered' ? `
-                rounded-md
-                ${selected ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-gray-800'}
-              ` : ''}
-              ${tab.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            `}
+            className={({ selected }) =>
+              cn(
+                'flex items-center gap-2 px-4 py-2 text-sm font-medium outline-none transition-colors',
+                variant === 'line' && [
+                  '-mb-px border-b-2',
+                  selected
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                ],
+                variant === 'pills' && [
+                  'rounded-md',
+                  selected
+                    ? 'bg-white text-gray-900 shadow'
+                    : 'text-gray-600 hover:text-gray-900',
+                ],
+                tab.disabled && 'opacity-50 cursor-not-allowed'
+              )
+            }
           >
+            {tab.icon && <span className="h-5 w-5">{tab.icon}</span>}
             {tab.label}
           </Tab>
         ))}
-      </TabList>
-
-      <TabPanels className="mt-4">
-        {tabs.map((tab) => (
-          <TabPanel key={tab.id}>{tab.content}</TabPanel>
+      </Tab.List>
+      <Tab.Panels className="mt-4">
+        {tabs.map((tab, index) => (
+          <Tab.Panel key={index}>{tab.content}</Tab.Panel>
         ))}
-      </TabPanels>
-    </TabGroup>
-  );
-}
-
-// 使用示例
-function SettingsPage() {
-  const tabs = [
-    {
-      id: 'profile',
-      label: 'Profile',
-      content: <ProfileSettings />,
-    },
-    {
-      id: 'account',
-      label: 'Account',
-      content: <AccountSettings />,
-    },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      content: <NotificationSettings />,
-    },
-  ];
-
-  return <Tabs tabs={tabs} variant="pills" />;
+      </Tab.Panels>
+    </Tab.Group>
+  )
 }
 ```
 
-### 6. Switch 开关
+### 6. 开关组件 (components/ui/Switch.tsx)
 
-```tsx
-// components/ui/Switch.tsx
-import { Switch, Field, Label } from '@headlessui/react';
+```typescript
+'use client'
 
-interface ToggleProps {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  label?: string;
-  description?: string;
-  disabled?: boolean;
+import { Switch } from '@headlessui/react'
+import { cn } from '@/lib/utils'
+
+interface ToggleSwitchProps {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  label?: string
+  description?: string
+  disabled?: boolean
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
 }
 
-export function Toggle({ checked, onChange, label, description, disabled }: ToggleProps) {
-  return (
-    <Field className="flex items-center justify-between">
-      <div className="flex flex-col">
-        {label && (
-          <Label className="text-sm font-medium text-gray-900">{label}</Label>
-        )}
-        {description && (
-          <span className="text-sm text-gray-500">{description}</span>
-        )}
-      </div>
-      <Switch
-        checked={checked}
-        onChange={onChange}
-        disabled={disabled}
-        className={`
-          group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
-          transition-colors duration-200 ease-in-out
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-          ${checked ? 'bg-blue-600' : 'bg-gray-200'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
-      >
-        <span className="sr-only">{label}</span>
-        <span
-          className={`
-            pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg
-            ring-0 transition duration-200 ease-in-out
-            ${checked ? 'translate-x-5' : 'translate-x-0'}
-          `}
-        />
-      </Switch>
-    </Field>
-  );
+const sizeConfig = {
+  sm: {
+    container: 'h-5 w-9',
+    dot: 'h-4 w-4',
+    translate: 'translate-x-4',
+  },
+  md: {
+    container: 'h-6 w-11',
+    dot: 'h-5 w-5',
+    translate: 'translate-x-5',
+  },
+  lg: {
+    container: 'h-7 w-14',
+    dot: 'h-6 w-6',
+    translate: 'translate-x-7',
+  },
 }
 
-// 使用示例
-function NotificationSettings() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(false);
-
-  return (
-    <div className="space-y-6">
-      <Toggle
-        checked={emailNotifications}
-        onChange={setEmailNotifications}
-        label="Email notifications"
-        description="Receive updates via email"
-      />
-      <Toggle
-        checked={pushNotifications}
-        onChange={setPushNotifications}
-        label="Push notifications"
-        description="Receive push notifications on your device"
-      />
-    </div>
-  );
-}
-```
-
-### 7. Disclosure 折叠面板
-
-```tsx
-// components/ui/Disclosure.tsx
-import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-
-interface AccordionItem {
-  id: string;
-  title: string;
-  content: React.ReactNode;
-  defaultOpen?: boolean;
-}
-
-interface AccordionProps {
-  items: AccordionItem[];
-  multiple?: boolean; // 是否允许多个同时展开
-}
-
-export function Accordion({ items, multiple = false }: AccordionProps) {
-  return (
-    <div className="divide-y divide-gray-200 rounded-lg bg-white">
-      {items.map((item) => (
-        <Disclosure key={item.id} defaultOpen={item.defaultOpen}>
-          {({ open }) => (
-            <>
-              <DisclosureButton className="flex w-full justify-between px-4 py-3 text-left text-sm font-medium text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <span>{item.title}</span>
-                <ChevronDownIcon
-                  className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                    open ? 'rotate-180 transform' : ''
-                  }`}
-                />
-              </DisclosureButton>
-              <Transition
-                enter="transition duration-100 ease-out"
-                enterFrom="transform scale-95 opacity-0"
-                enterTo="transform scale-100 opacity-100"
-                leave="transition duration-75 ease-out"
-                leaveFrom="transform scale-100 opacity-100"
-                leaveTo="transform scale-95 opacity-0"
-              >
-                <DisclosurePanel className="px-4 py-3 text-sm text-gray-600">
-                  {item.content}
-                </DisclosurePanel>
-              </Transition>
-            </>
-          )}
-        </Disclosure>
-      ))}
-    </div>
-  );
-}
-
-// 使用示例
-function FAQSection() {
-  const faqItems = [
-    {
-      id: '1',
-      title: 'What is Headless UI?',
-      content: 'Headless UI is a completely unstyled, accessible UI component library...',
-    },
-    {
-      id: '2',
-      title: 'How do I style components?',
-      content: 'Since Headless UI is unstyled, you can use Tailwind CSS, CSS modules, or any styling solution...',
-    },
-  ];
-
-  return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">FAQ</h2>
-      <Accordion items={faqItems} />
-    </div>
-  );
-}
-```
-
-### 8. RadioGroup 单选组
-
-```tsx
-// components/ui/RadioGroup.tsx
-import { Radio, RadioGroup, Field, Label, Description } from '@headlessui/react';
-
-interface RadioOption {
-  value: string;
-  label: string;
-  description?: string;
-  disabled?: boolean;
-}
-
-interface CustomRadioGroupProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: RadioOption[];
-  label?: string;
-  layout?: 'vertical' | 'horizontal';
-}
-
-export function CustomRadioGroup({
-  value,
+export function ToggleSwitch({
+  checked,
   onChange,
-  options,
   label,
-  layout = 'vertical',
-}: CustomRadioGroupProps) {
+  description,
+  disabled = false,
+  size = 'md',
+  className,
+}: ToggleSwitchProps) {
+  const config = sizeConfig[size]
+
   return (
-    <RadioGroup value={value} onChange={onChange}>
-      {label && (
-        <Label className="text-sm font-medium text-gray-900 mb-3 block">
-          {label}
-        </Label>
-      )}
-      <div className={`space-y-2 ${layout === 'horizontal' ? 'flex gap-4 space-y-0' : ''}`}>
-        {options.map((option) => (
-          <Field key={option.value} disabled={option.disabled}>
-            <Radio
-              value={option.value}
-              className={({ checked }) => `
-                group flex cursor-pointer rounded-lg border p-3
-                ${checked ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'}
-                ${option.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}
-              `}
-            >
-              {({ checked }) => (
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex flex-col">
-                    <Label className={`text-sm font-medium ${checked ? 'text-blue-900' : 'text-gray-900'}`}>
-                      {option.label}
-                    </Label>
-                    {option.description && (
-                      <Description className="text-sm text-gray-500">
-                        {option.description}
-                      </Description>
-                    )}
-                  </div>
-                  <div
-                    className={`
-                      h-5 w-5 rounded-full border-2 flex items-center justify-center
-                      ${checked ? 'border-blue-500 bg-blue-500' : 'border-gray-300 bg-white'}
-                    `}
-                  >
-                    {checked && (
-                      <div className="h-2 w-2 rounded-full bg-white" />
-                    )}
-                  </div>
-                </div>
-              )}
-            </Radio>
-          </Field>
-        ))}
+    <Switch.Group>
+      <div className={cn('flex items-center gap-4', className)}>
+        <Switch
+          checked={checked}
+          onChange={onChange}
+          disabled={disabled}
+          className={cn(
+            'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+            config.container,
+            checked ? 'bg-primary' : 'bg-gray-200',
+            disabled && 'opacity-50 cursor-not-allowed'
+          )}
+        >
+          <span
+            className={cn(
+              'pointer-events-none inline-block rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out',
+              config.dot,
+              checked ? config.translate : 'translate-x-0'
+            )}
+          />
+        </Switch>
+        {(label || description) && (
+          <div className="flex flex-col">
+            {label && (
+              <Switch.Label className="text-sm font-medium text-gray-900">
+                {label}
+              </Switch.Label>
+            )}
+            {description && (
+              <Switch.Description className="text-sm text-gray-500">
+                {description}
+              </Switch.Description>
+            )}
+          </div>
+        )}
       </div>
-    </RadioGroup>
-  );
+    </Switch.Group>
+  )
 }
 ```
 
 ## 最佳实践
 
 ### 1. 可访问性
+```typescript
+// ✅ 使用 Headless UI 提供的 ARIA 属性
+<Menu.Button className="...">
+<Menu.Items className="...">
+  <Menu.Item>...</Menu.Item>
+</Menu.Items>
 
-```tsx
-// 所有组件都支持键盘导航和屏幕阅读器
-<Menu>
-  <MenuButton aria-label="More options">
-    <DotsVerticalIcon className="h-5 w-5" />
-  </MenuButton>
-  <MenuItems>
-    <MenuItem>
-      <button className="focus:ring-2 focus:ring-blue-500">
-        Edit
-      </button>
-    </MenuItem>
-  </MenuItems>
-</Menu>
+// ✅ 提供适当的标签
+<Switch.Label>Enable notifications</Switch.Label>
+
+// ✅ 使用 Description
+<Switch.Description>
+  Receive push notifications for new messages
+</Switch.Description>
 ```
 
-### 2. 受控 vs 非受控
+### 2. 过渡动画
+```typescript
+// ✅ 使用 Transition 组件
+<Transition
+  show={isOpen}
+  enter="transition ease-out duration-100"
+  enterFrom="transform opacity-0 scale-95"
+  enterTo="transform opacity-100 scale-100"
+  leave="transition ease-in duration-75"
+  leaveFrom="transform opacity-100 scale-100"
+  leaveTo="transform opacity-0 scale-95"
+>
 
-```tsx
-// 非受控（内部管理状态）
-<Switch defaultChecked={true} />
-
-// 受控（外部管理状态）
-const [enabled, setEnabled] = useState(true);
-<Switch checked={enabled} onChange={setEnabled} />
+// ✅ 使用 Fragment 包装
+<Transition as={Fragment} show={isOpen}>
 ```
 
-### 3. 组合模式
+### 3. 受控 vs 非受控
+```typescript
+// ✅ 受控组件（推荐用于表单）
+<Listbox value={selected} onChange={setSelected}>
 
-```tsx
-// 灵活组合组件
-<Menu>
-  <MenuButton as={Fragment}>
-    <Button variant="primary">
-      Options <ChevronDownIcon />
-    </Button>
-  </MenuButton>
-  <MenuItems anchor="bottom start">
-    <MenuItem>
-      <Link to="/edit">Edit</Link>
-    </MenuItem>
-    <MenuItem>
-      <Link to="/delete">Delete</Link>
-    </MenuItem>
-  </MenuItems>
-</Menu>
+// ✅ 非受控组件
+<Disclosure defaultOpen={false}>
+
+// ✅ 使用 nullable 处理空值
+<Combobox value={value} onChange={onChange} nullable>
+```
+
+### 4. 焦点管理
+```typescript
+// ✅ 自动焦点捕获
+<Dialog onClose={close} initialFocus={initialRef}>
+
+// ✅ 自定义焦点顺序
+<Tab.Group>
+  <Tab.List>
+    <Tab>Tab 1</Tab>
+    <Tab>Tab 2</Tab>
+  </Tab.List>
+</Tab.Group>
 ```
 
 ## 常用命令
 
+### 安装
 ```bash
-# 安装
+# React
 npm install @headlessui/react
 
-# 与 Tailwind CSS 一起使用
-npm install tailwindcss @headlessui/react
+# Vue
+npm install @headlessui/vue
 
-# 图标库（可选）
-npm install @heroicons/react
+# Tailwind 插件
+npm install @headlessui/tailwindcss
 ```
 
-## 部署配置
-
-### Tailwind CSS 配置
-
+### Tailwind 配置
 ```javascript
 // tailwind.config.js
 module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {},
   },
-  plugins: [],
-};
-```
-
-### Vite 配置
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          headlessui: ['@headlessui/react'],
-        },
-      },
-    },
-  },
-});
-```
-
-## 测试
-
-```tsx
-// __tests__/DropdownMenu.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { DropdownMenu } from '../components/ui/Menu';
-
-test('opens menu on click', async () => {
-  const user = userEvent.setup();
-  const items = [
-    { id: '1', label: 'Edit', onClick: jest.fn() },
-    { id: '2', label: 'Delete', onClick: jest.fn() },
-  ];
-
-  render(<DropdownMenu button="Options" items={items} />);
-
-  await user.click(screen.getByRole('button', { name: /options/i }));
-  
-  expect(screen.getByRole('menuitem', { name: /edit/i })).toBeInTheDocument();
-  expect(screen.getByRole('menuitem', { name: /delete/i })).toBeInTheDocument();
-});
-```
-
-## 性能优化
-
-### 1. 懒加载模态框
-
-```tsx
-const HeavyModal = lazy(() => import('./HeavyModal'));
-
-function App() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      <button onClick={() => setIsOpen(true)}>Open Modal</button>
-      {isOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <HeavyModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
-        </Suspense>
-      )}
-    </>
-  );
+  plugins: [
+    require('@headlessui/tailwindcss'),
+  ],
 }
 ```
 
-### 2. 虚拟化长列表
+## 扩展资源
 
-```tsx
-import { Combobox, ComboboxOptions } from '@headlessui/react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-
-function VirtualizedCombobox({ options }) {
-  const parentRef = useRef(null);
-  
-  const virtualizer = useVirtualizer({
-    count: options.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 40,
-  });
-
-  return (
-    <ComboboxOptions
-      ref={parentRef}
-      className="max-h-60 overflow-auto"
-    >
-      {virtualizer.getVirtualItems().map((virtualItem) => (
-        <ComboboxOption
-          key={options[virtualItem.index].id}
-          value={options[virtualItem.index]}
-          style={{
-            position: 'absolute',
-            transform: `translateY(${virtualItem.start}px)`,
-          }}
-        >
-          {options[virtualItem.index].name}
-        </ComboboxOption>
-      ))}
-    </ComboboxOptions>
-  );
-}
-```
+- [Headless UI 官方文档](https://headlessui.com)
+- [React 组件 API](https://headlessui.com/react/menu)
+- [Vue 组件 API](https://headlessui.com/vue/menu)
+- [Tailwind CSS 集成](https://tailwindui.com/components)
+- [示例代码库](https://github.com/tailwindlabs/headlessui/tree/main/packages/%40headlessui-react/src/components)
