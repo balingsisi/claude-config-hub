@@ -33,6 +33,10 @@ import sstServerlessContent from './sst-serverless.md'
 import daisyuiContent from './daisyui.md'
 import reactNativePaperContent from './react-native-paper.md'
 import typeboxValidationContent from './typebox-validation.md'
+import vuetify3Content from './vuetify-3.md'
+import quasarFrameworkContent from './quasar-framework.md'
+import feathersjsContent from './feathersjs.md'
+import edgedbContent from './edgedb.md'
 
 export const templates: Template[] = [
   {
