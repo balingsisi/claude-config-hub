@@ -49,6 +49,10 @@ import millionjsContent from './millionjs.md'
 import grapejsContent from './grapejs.md'
 import overmindContent from './overmind.md'
 import inertiajsContent from './inertiajs.md'
+import kyselyContent from './kysely.md'
+import luciaAuthContent from './lucia-auth.md'
+import valtioContent from './valtio.md'
+import tanstackFormContent from './tanstack-form.md'
 
 export const templates: Template[] = [
   {
@@ -1423,6 +1427,131 @@ export const templates: Template[] = [
     },
     status: TemplateStatus.PUBLISHED,
     featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'kysely',
+    name: 'Kysely - Type-Safe SQL Query Builder',
+    slug: 'kysely',
+    description: 'Type-safe SQL query builder for TypeScript with fluent API, auto-completion, and support for PostgreSQL, MySQL, and SQLite',
+    content: kyselyContent,
+    tags: ['kysely', 'sql', 'query-builder', 'typescript', 'database', 'postgresql', 'mysql', 'sqlite'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Kysely',
+      frameworkVersion: '0.27+',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      database: 'PostgreSQL / MySQL / SQLite',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 0,
+      copies: 0,
+      stars: 0,
+      forks: 0,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'lucia-auth',
+    name: 'Lucia Auth - Complete Authentication Framework',
+    slug: 'lucia-auth',
+    description: 'Flexible authentication framework for TypeScript with multiple auth methods, session management, and database-agnostic design',
+    content: luciaAuthContent,
+    tags: ['lucia', 'authentication', 'auth', 'typescript', 'oauth', 'session', 'security'],
+    category: TemplateCategory.BACKEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Lucia Auth',
+      frameworkVersion: '3.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 0,
+      copies: 0,
+      stars: 0,
+      forks: 0,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'valtio',
+    name: 'Valtio - Proxy State Management',
+    slug: 'valtio',
+    description: 'Minimalistic state management library for React with mutable API, automatic re-renders, and TypeScript support',
+    content: valtioContent,
+    tags: ['valtio', 'state-management', 'react', 'proxy', 'typescript', 'hooks'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.BEGINNER,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Valtio',
+      frameworkVersion: '1.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'React Testing Library'],
+    },
+    stats: {
+      views: 0,
+      copies: 0,
+      stars: 0,
+      forks: 0,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'tanstack-form',
+    name: 'TanStack Form - Headless Form Management',
+    slug: 'tanstack-form',
+    description: 'Comprehensive headless form management library with type-safe validation, field arrays, and async validation support',
+    content: tanstackFormContent,
+    tags: ['tanstack', 'form', 'validation', 'react', 'typescript', 'headless', 'zod'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'TanStack Form',
+      frameworkVersion: '0.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'React Testing Library'],
+    },
+    stats: {
+      views: 0,
+      copies: 0,
+      stars: 0,
+      forks: 0,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
     createdAt: '2026-03-17T00:00:00.000Z',
     updatedAt: '2026-03-17T00:00:00.000Z',
   },
