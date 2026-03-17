@@ -1,151 +1,235 @@
-# Immer 模板
-
-不可变状态管理库，通过"草稿"机制简化不可变数据操作。
+# Immer 不可变状态模板
 
 ## 技术栈
 
-- **核心**: Immer
-- **运行时**: Node.js / 浏览器 / React Native
-- **框架集成**: React / Redux / Zustand
-- **工具**: TypeScript / ES6+
-- **测试**: Vitest / Jest
+- **核心库**: immer v10.0+
+- **状态管理**: React hooks, Redux, Zustand
+- **类型支持**: TypeScript
+- **框架集成**: React 18+
+- **工具库**: use-immer, @reduxjs/toolkit
 
 ## 项目结构
 
 ```
-immer-app/
-├── src/
-│   ├── store/               # 状态管理
-│   │   ├── user-store.ts
-│   │   ├── cart-store.ts
-│   │   └── settings-store.ts
-│   ├── reducers/            # Reducers（用于 Redux）
-│   │   ├── todos-reducer.ts
-│   │   └── auth-reducer.ts
-│   ├── hooks/               # React Hooks
-│   │   ├── use-immer.ts
-│   │   └── use-immer-reducer.ts
-│   ├── utils/               # 工具函数
-│   │   ├── produce-utils.ts
-│   │   └── patch-utils.ts
-│   └── types/
-│       └── state.ts
-├── tests/
-│   └── store/
-├── immer.config.ts
-└── package.json
+src/
+├── store/
+│   ├── index.ts              # 导出所有 store
+│   ├── userStore.ts          # 用户状态
+│   ├── cartStore.ts          # 购物车状态
+│   ├── todoStore.ts          # 待办事项
+│   └── formStore.ts          # 表单状态
+├── hooks/
+│   ├── useImmerState.ts      # Immer 状态 Hook
+│   ├── useImmerReducer.ts    # Immer Reducer Hook
+│   └── useImmerForm.ts       # 表单 Hook
+├── utils/
+│   ├── immerHelpers.ts       # 辅助函数
+│   ├── immerMiddleware.ts    # 中间件
+│   └── immerProducers.ts     # 生产函数
+├── components/
+│   ├── Form.tsx              # 表单组件
+│   ├── TodoList.tsx          # 待办列表
+│   └── ShoppingCart.tsx      # 购物车
+└── types/
+    └── immer.d.ts            # 类型定义
 ```
 
 ## 代码模式
 
-### 基础用法
+### 1. 基础配置
 
 ```typescript
+// src/utils/immerHelpers.ts
+import { produce, enableMapSet, enablePatches } from 'immer';
+
+// 启用 ES6 Map/Set 支持
+enableMapSet();
+
+// 启用补丁支持（用于撤销/重做）
+enablePatches();
+
+export { produce };
+
+// 类型定义
+export type Draft<T> = {
+  -readonly [P in keyof T]: Draft<T[P]>;
+};
+
+export type Recipe<S> = (draft: Draft<S>) => void | S | undefined;
+```
+
+### 2. 基础用法
+
+```typescript
+// src/utils/immerBasics.ts
 import { produce } from 'immer';
 
+// 基础状态更新
 interface State {
-  readonly users: readonly string[];
-  readonly count: number;
+  name: string;
+  age: number;
+  address: {
+    city: string;
+    country: string;
+  };
+  hobbies: string[];
 }
 
 const baseState: State = {
-  users: ['Alice', 'Bob'],
-  count: 0,
+  name: 'Alice',
+  age: 25,
+  address: {
+    city: 'Shanghai',
+    country: 'China',
+  },
+  hobbies: ['reading', 'coding'],
 };
 
-// 使用 produce 创建新状态
+// ✅ 使用 Immer（可变风格）
 const nextState = produce(baseState, (draft) => {
-  // 在草稿上直接修改
-  draft.users.push('Charlie');
-  draft.count += 1;
+  draft.age = 26;
+  draft.address.city = 'Beijing';
+  draft.hobbies.push('gaming');
 });
 
-console.log(baseState.users); // ['Alice', 'Bob'] - 未改变
-console.log(nextState.users); // ['Alice', 'Bob', 'Charlie']
-console.log(baseState === nextState); // false
+// ❌ 传统方式（繁琐）
+const nextStateOld = {
+  ...baseState,
+  age: 26,
+  address: {
+    ...baseState.address,
+    city: 'Beijing',
+  },
+  hobbies: [...baseState.hobbies, 'gaming'],
+};
 ```
 
-### React Hooks
+### 3. React Hooks
 
 ```typescript
-import { useImmer } from 'use-immer';
+// src/hooks/useImmerState.ts
+import { useState, useCallback } from 'react';
+import { produce, Draft } from 'immer';
 
-interface User {
-  name: string;
-  age: number;
+export function useImmerState<T>(
+  initialValue: T | (() => T)
+): [T, (updater: (draft: Draft<T>) => void | T) => void] {
+  const [state, setState] = useState(initialValue);
+
+  const updateState = useCallback((updater: (draft: Draft<T>) => void | T) => {
+    setState((prev) => produce(prev, updater));
+  }, []);
+
+  return [state, updateState];
 }
 
-function UserProfile() {
-  const [user, updateUser] = useImmer<User>({
+// 使用示例
+interface User {
+  name: string;
+  email: string;
+  preferences: {
+    theme: 'light' | 'dark';
+    notifications: boolean;
+  };
+}
+
+function UserSettings() {
+  const [user, updateUser] = useImmerState<User>({
     name: 'Alice',
-    age: 25,
+    email: 'alice@example.com',
+    preferences: {
+      theme: 'light',
+      notifications: true,
+    },
   });
 
-  const updateName = (name: string) => {
+  const toggleTheme = () => {
     updateUser((draft) => {
-      draft.name = name;
+      draft.preferences.theme = draft.preferences.theme === 'light' ? 'dark' : 'light';
     });
   };
 
-  const incrementAge = () => {
+  const updateEmail = (email: string) => {
     updateUser((draft) => {
-      draft.age += 1;
+      draft.email = email;
     });
   };
 
   return (
     <div>
       <p>Name: {user.name}</p>
-      <p>Age: {user.age}</p>
-      <button onClick={() => updateName('Bob')}>Change Name</button>
-      <button onClick={incrementAge}>Increment Age</button>
+      <p>Theme: {user.preferences.theme}</p>
+      <button onClick={toggleTheme}>Toggle Theme</button>
     </div>
   );
 }
 ```
 
-### useImmerReducer
+### 4. useImmerReducer
 
 ```typescript
-import { useImmerReducer } from 'use-immer';
+// src/hooks/useImmerReducer.ts
+import { useReducer, useCallback } from 'react';
+import { produce, Draft } from 'immer';
 
+type Action<T> = {
+  type: string;
+  payload?: any;
+};
+
+type Reducer<S, A> = (draft: Draft<S>, action: A) => void | S;
+
+export function useImmerReducer<S, A extends Action<S>>(
+  reducer: Reducer<S, A>,
+  initialState: S
+): [S, (action: A) => void] {
+  const immerReducer = useCallback(
+    (state: S, action: A) => produce(state, (draft) => reducer(draft, action)),
+    [reducer]
+  );
+
+  return useReducer(immerReducer, initialState);
+}
+
+// 使用示例
 interface Todo {
   id: number;
   text: string;
   completed: boolean;
 }
 
-type Action =
-  | { type: 'ADD'; text: string }
-  | { type: 'TOGGLE'; id: number }
-  | { type: 'DELETE'; id: number };
-
-function todosReducer(draft: Todo[], action: Action) {
-  switch (action.type) {
-    case 'ADD':
-      draft.push({
-        id: Date.now(),
-        text: action.text,
-        completed: false,
-      });
-      break;
-    case 'TOGGLE':
-      const todo = draft.find((t) => t.id === action.id);
-      if (todo) todo.completed = !todo.completed;
-      break;
-    case 'DELETE':
-      const index = draft.findIndex((t) => t.id === action.id);
-      if (index !== -1) draft.splice(index, 1);
-      break;
-  }
-}
+type TodoAction =
+  | { type: 'ADD'; payload: string }
+  | { type: 'TOGGLE'; payload: number }
+  | { type: 'DELETE'; payload: number };
 
 function TodoList() {
-  const [todos, dispatch] = useImmerReducer(todosReducer, []);
+  const [todos, dispatch] = useImmerReducer<Todo[], TodoAction>(
+    (draft, action) => {
+      switch (action.type) {
+        case 'ADD':
+          draft.push({
+            id: Date.now(),
+            text: action.payload,
+            completed: false,
+          });
+          break;
+        case 'TOGGLE':
+          const todo = draft.find((t) => t.id === action.payload);
+          if (todo) todo.completed = !todo.completed;
+          break;
+        case 'DELETE':
+          const index = draft.findIndex((t) => t.id === action.payload);
+          if (index !== -1) draft.splice(index, 1);
+          break;
+      }
+    },
+    []
+  );
 
   return (
     <div>
-      <button onClick={() => dispatch({ type: 'ADD', text: 'New Todo' })}>
+      <button onClick={() => dispatch({ type: 'ADD', payload: 'New todo' })}>
         Add Todo
       </button>
       <ul>
@@ -153,11 +237,11 @@ function TodoList() {
           <li key={todo.id}>
             <span
               style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
-              onClick={() => dispatch({ type: 'TOGGLE', id: todo.id })}
+              onClick={() => dispatch({ type: 'TOGGLE', payload: todo.id })}
             >
               {todo.text}
             </span>
-            <button onClick={() => dispatch({ type: 'DELETE', id: todo.id })}>
+            <button onClick={() => dispatch({ type: 'DELETE', payload: todo.id })}>
               Delete
             </button>
           </li>
@@ -168,410 +252,667 @@ function TodoList() {
 }
 ```
 
-### Redux 集成
+### 5. 表单处理
 
 ```typescript
-import { produce } from 'immer';
-import { createSlice, configureStore } from '@reduxjs/toolkit';
+// src/hooks/useImmerForm.ts
+import { useCallback } from 'react';
+import { useImmerState } from './useImmerState';
 
-// Redux Toolkit 内部已使用 Immer
+interface FormState<T> {
+  values: T;
+  errors: Partial<Record<keyof T, string>>;
+  touched: Partial<Record<keyof T, boolean>>;
+}
+
+export function useImmerForm<T extends Record<string, any>>(
+  initialValues: T
+) {
+  const [state, updateState] = useImmerState<FormState<T>>({
+    values: initialValues,
+    errors: {},
+    touched: {},
+  });
+
+  const handleChange = useCallback((field: keyof T, value: any) => {
+    updateState((draft) => {
+      draft.values[field] = value;
+      draft.touched[field] = true;
+    });
+  }, [updateState]);
+
+  const setError = useCallback((field: keyof T, error: string) => {
+    updateState((draft) => {
+      draft.errors[field] = error;
+    });
+  }, [updateState]);
+
+  const clearError = useCallback((field: keyof T) => {
+    updateState((draft) => {
+      delete draft.errors[field];
+    });
+  }, [updateState]);
+
+  const reset = useCallback(() => {
+    updateState((draft) => {
+      draft.values = initialValues;
+      draft.errors = {};
+      draft.touched = {};
+    });
+  }, [initialValues, updateState]);
+
+  return {
+    values: state.values,
+    errors: state.errors,
+    touched: state.touched,
+    handleChange,
+    setError,
+    clearError,
+    reset,
+  };
+}
+
+// 使用示例
+interface ContactForm {
+  name: string;
+  email: string;
+  message: string;
+}
+
+function ContactForm() {
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    setError,
+    clearError,
+    reset,
+  } = useImmerForm<ContactForm>({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // 验证
+    if (!values.name) {
+      setError('name', 'Name is required');
+      return;
+    }
+    
+    if (!values.email.includes('@')) {
+      setError('email', 'Invalid email');
+      return;
+    }
+    
+    // 提交
+    console.log('Submit:', values);
+    reset();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={values.name}
+        onChange={(e) => handleChange('name', e.target.value)}
+        placeholder="Name"
+      />
+      {touched.name && errors.name && <span>{errors.name}</span>}
+      
+      <input
+        value={values.email}
+        onChange={(e) => handleChange('email', e.target.value)}
+        placeholder="Email"
+      />
+      {touched.email && errors.email && <span>{errors.email}</span>}
+      
+      <textarea
+        value={values.message}
+        onChange={(e) => handleChange('message', e.target.value)}
+        placeholder="Message"
+      />
+      
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+### 6. 购物车示例
+
+```typescript
+// src/store/cartStore.ts
+import { produce } from 'immer';
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+interface CartState {
+  items: CartItem[];
+  total: number;
+}
+
+export function createCartStore() {
+  let state: CartState = {
+    items: [],
+    total: 0,
+  };
+
+  const listeners = new Set<() => void>();
+
+  const getState = () => state;
+
+  const setState = (newState: CartState) => {
+    state = newState;
+    listeners.forEach((listener) => listener());
+  };
+
+  const subscribe = (listener: () => void) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  };
+
+  const addItem = (product: Product) => {
+    setState(
+      produce(state, (draft) => {
+        const existingItem = draft.items.find((item) => item.id === product.id);
+        
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          draft.items.push({ ...product, quantity: 1 });
+        }
+        
+        draft.total = draft.items.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+      })
+    );
+  };
+
+  const removeItem = (productId: string) => {
+    setState(
+      produce(state, (draft) => {
+        const index = draft.items.findIndex((item) => item.id === productId);
+        if (index !== -1) {
+          draft.items.splice(index, 1);
+          draft.total = draft.items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+        }
+      })
+    );
+  };
+
+  const updateQuantity = (productId: string, quantity: number) => {
+    setState(
+      produce(state, (draft) => {
+        const item = draft.items.find((item) => item.id === productId);
+        if (item) {
+          item.quantity = Math.max(0, quantity);
+          draft.total = draft.items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+        }
+      })
+    );
+  };
+
+  const clearCart = () => {
+    setState(
+      produce(state, (draft) => {
+        draft.items = [];
+        draft.total = 0;
+      })
+    );
+  };
+
+  return {
+    getState,
+    subscribe,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+  };
+}
+
+// 使用示例
+function ShoppingCart() {
+  const cartStore = createCartStore();
+  const [state, setState] = useState(cartStore.getState());
+
+  useEffect(() => {
+    return cartStore.subscribe(() => {
+      setState(cartStore.getState());
+    });
+  }, []);
+
+  const handleAdd = (product: Product) => {
+    cartStore.addItem(product);
+  };
+
+  return (
+    <div>
+      <h2>Shopping Cart</h2>
+      <ul>
+        {state.items.map((item) => (
+          <li key={item.id}>
+            {item.name} x {item.quantity} = ${item.price * item.quantity}
+          </li>
+        ))}
+      </ul>
+      <p>Total: ${state.total}</p>
+    </div>
+  );
+}
+```
+
+### 7. Redux 集成
+
+```typescript
+// src/store/reduxStore.ts
+import { createSlice, configureStore, PayloadAction } from '@reduxjs/toolkit';
+// @reduxjs/toolkit 内部使用 Immer
+
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
 const todosSlice = createSlice({
   name: 'todos',
   initialState: [] as Todo[],
   reducers: {
-    addTodo: (state, action) => {
-      // 可以直接修改 state
+    addTodo: (state, action: PayloadAction<string>) => {
+      // ✅ 可以直接修改（RTK 内部使用 Immer）
       state.push({
         id: Date.now(),
         text: action.payload,
         completed: false,
       });
     },
-    toggleTodo: (state, action) => {
+    toggleTodo: (state, action: PayloadAction<number>) => {
       const todo = state.find((t) => t.id === action.payload);
       if (todo) {
         todo.completed = !todo.completed;
       }
     },
-    removeTodo: (state, action) => {
-      return state.filter((t) => t.id !== action.payload);
+    deleteTodo: (state, action: PayloadAction<number>) => {
+      const index = state.findIndex((t) => t.id === action.payload);
+      if (index !== -1) {
+        state.splice(index, 1);
+      }
     },
   },
 });
 
-const store = configureStore({
+export const { addTodo, toggleTodo, deleteTodo } = todosSlice.actions;
+
+export const store = configureStore({
   reducer: {
     todos: todosSlice.reducer,
   },
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 ```
 
-### Zustand 集成
+### 8. 补丁与撤销/重做
 
 ```typescript
-import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
+// src/utils/immerPatches.ts
+import { produce, enablePatches, Patch } from 'immer';
 
-interface StoreState {
-  users: User[];
-  count: number;
-  addUser: (user: User) => void;
-  removeUser: (id: string) => void;
-  increment: () => void;
-}
+enablePatches();
 
-const useStore = create<StoreState>()(
-  immer((set) => ({
-    users: [],
-    count: 0,
-    addUser: (user) =>
-      set((state) => {
-        state.users.push(user);
-      }),
-    removeUser: (id) =>
-      set((state) => {
-        const index = state.users.findIndex((u) => u.id === id);
-        if (index !== -1) state.users.splice(index, 1);
-      }),
-    increment: () =>
-      set((state) => {
-        state.count += 1;
-      }),
-  }))
-);
-```
-
-### 嵌套对象更新
-
-```typescript
-import { produce } from 'immer';
-
-interface DeepState {
-  nested: {
-    deep: {
-      value: number;
-      items: string[];
-    };
+interface HistoryState<T> {
+  current: T;
+  history: {
+    past: Array<{ patches: Patch[]; inversePatches: Patch[] }>;
+    future: Array<{ patches: Patch[]; inversePatches: Patch[] }>;
   };
 }
 
-const state: DeepState = {
-  nested: {
-    deep: {
-      value: 0,
-      items: ['a', 'b'],
+export function createHistory<T>(initialState: T) {
+  let state: HistoryState<T> = {
+    current: initialState,
+    history: {
+      past: [],
+      future: [],
     },
-  },
-};
+  };
 
-const nextState = produce(state, (draft) => {
-  // 直接修改深层嵌套对象
-  draft.nested.deep.value += 1;
-  draft.nested.deep.items.push('c');
-});
+  const update = (recipe: (draft: T) => void) => {
+    const [nextState, patches, inversePatches] = produce(
+      state.current,
+      recipe,
+      true
+    );
+
+    state = {
+      current: nextState,
+      history: {
+        past: [...state.history.past, { patches, inversePatches }],
+        future: [],
+      },
+    };
+
+    return state;
+  };
+
+  const undo = () => {
+    if (state.history.past.length === 0) return state;
+
+    const { patches, inversePatches } = state.history.past[
+      state.history.past.length - 1
+    ];
+
+    const previousState = produce(
+      state.current,
+      (draft) => {
+        // 应用反向补丁
+        applyPatches(draft, inversePatches);
+      }
+    ) as T;
+
+    state = {
+      current: previousState,
+      history: {
+        past: state.history.past.slice(0, -1),
+        future: [{ patches, inversePatches }, ...state.history.future],
+      },
+    };
+
+    return state;
+  };
+
+  const redo = () => {
+    if (state.history.future.length === 0) return state;
+
+    const { patches, inversePatches } = state.history.future[0];
+
+    const nextState = produce(
+      state.current,
+      (draft) => {
+        // 应用补丁
+        applyPatches(draft, patches);
+      }
+    ) as T;
+
+    state = {
+      current: nextState,
+      history: {
+        past: [...state.history.past, { patches, inversePatches }],
+        future: state.history.future.slice(1),
+      },
+    };
+
+    return state;
+  };
+
+  const canUndo = () => state.history.past.length > 0;
+  const canRedo = () => state.history.future.length > 0;
+
+  return {
+    getState: () => state,
+    update,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  };
+}
 ```
 
-### 数组操作
+### 9. 异步更新
 
 ```typescript
-import { produce } from 'immer';
+// src/hooks/useAsyncImmer.ts
+import { useState, useCallback } from 'react';
+import { produce, Draft } from 'immer';
 
-interface State {
-  items: Array<{ id: string; value: number }>;
+interface AsyncState<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
 }
 
-const state: State = {
-  items: [
-    { id: '1', value: 10 },
-    { id: '2', value: 20 },
-  ],
-};
+export function useAsyncImmer<T>(initialData: T | null = null) {
+  const [state, setState] = useState<AsyncState<T>>({
+    data: initialData,
+    loading: false,
+    error: null,
+  });
 
-const nextState = produce(state, (draft) => {
-  // 添加元素
-  draft.items.push({ id: '3', value: 30 });
+  const execute = useCallback(
+    async (
+      asyncFn: () => Promise<T>,
+      onSuccess?: (data: T) => void,
+      onError?: (error: Error) => void
+    ) => {
+      setState(
+        produce((draft) => {
+          draft.loading = true;
+          draft.error = null;
+        })
+      );
 
-  // 删除元素
-  draft.items.splice(0, 1);
+      try {
+        const data = await asyncFn();
+        setState(
+          produce((draft) => {
+            draft.data = data;
+            draft.loading = false;
+          })
+        );
+        onSuccess?.(data);
+      } catch (error) {
+        setState(
+          produce((draft) => {
+            draft.error = error as Error;
+            draft.loading = false;
+          })
+        );
+        onError?.(error as Error);
+      }
+    },
+    []
+  );
 
-  // 更新元素
-  const item = draft.items.find((i) => i.id === '2');
-  if (item) item.value += 5;
+  const updateData = useCallback((updater: (draft: Draft<T>) => void) => {
+    setState(
+      produce((draft) => {
+        if (draft.data) {
+          updater(draft.data as Draft<T>);
+        }
+      })
+    );
+  }, []);
 
-  // 过滤
-  draft.items = draft.items.filter((i) => i.value > 15);
-});
-```
+  const reset = useCallback(() => {
+    setState({
+      data: initialData,
+      loading: false,
+      error: null,
+    });
+  }, [initialData]);
 
-### Map 和 Set
-
-```typescript
-import { produce } from 'immer';
-
-interface State {
-  userMap: Map<string, User>;
-  idSet: Set<string>;
+  return {
+    ...state,
+    execute,
+    updateData,
+    reset,
+  };
 }
-
-const state: State = {
-  userMap: new Map([['1', { id: '1', name: 'Alice' }]]),
-  idSet: new Set(['1', '2']),
-};
-
-const nextState = produce(state, (draft) => {
-  // Map 操作
-  draft.userMap.set('2', { id: '2', name: 'Bob' });
-  draft.userMap.delete('1');
-
-  // Set 操作
-  draft.idSet.add('3');
-  draft.idSet.delete('1');
-});
-```
-
-### Patches（补丁记录）
-
-```typescript
-import { produceWithPatches, applyPatches, enablePatches } from 'immer';
-
-// 启用 patches
-enablePatches();
-
-interface State {
-  value: number;
-}
-
-const state: State = { value: 0 };
-
-// 生成补丁
-const [nextState, patches, inversePatches] = produceWithPatches(state, (draft) => {
-  draft.value += 1;
-});
-
-console.log(patches);
-// [{ op: 'replace', path: ['value'], value: 1 }]
-
-// 应用补丁
-const restored = applyPatches(state, patches);
-
-// 撤销（应用反向补丁）
-const undone = applyPatches(nextState, inversePatches);
-```
-
-### 当前状态快照
-
-```typescript
-import { produce, current } from 'immer';
-
-interface State {
-  items: string[];
-  logs: string[];
-}
-
-const state: State = {
-  items: ['a', 'b'],
-  logs: [],
-};
-
-const nextState = produce(state, (draft) => {
-  // 获取当前草稿的快照
-  const snapshot = current(draft.items);
-  draft.logs.push(`Items: ${snapshot.join(', ')}`);
-
-  draft.items.push('c');
-});
 ```
 
 ## 最佳实践
 
-### 1. 类型安全
+### 1. 性能优化
 
 ```typescript
-import { produce } from 'immer';
+// ✅ 使用 produce 进行批量更新
+const nextState = produce(state, (draft) => {
+  draft.user.name = 'Alice';
+  draft.user.age = 30;
+  draft.items.push(newItem);
+});
+
+// ✅ 避免不必要的 produce
+const updatedItems = produce(items, (draft) => {
+  // 只在需要时更新
+  if (shouldUpdate) {
+    draft.push(newItem);
+  }
+});
+
+// ✅ 使用 useCallback 缓存更新函数
+const updateUser = useCallback((name: string) => {
+  updateState((draft) => {
+    draft.user.name = name;
+  });
+}, [updateState]);
+```
+
+### 2. 类型安全
+
+```typescript
+// ✅ 使用 Draft 类型
+import { Draft } from 'immer';
 
 interface State {
-  readonly users: readonly User[];
-  readonly count: number;
+  readonly id: string;
+  readonly name: string;
+  readonly items: readonly string[];
 }
 
-const nextState = produce(state: State, (draft) => {
-  // draft 自动推断为可写类型
-  draft.users.push({ id: '3', name: 'Charlie' });
-  draft.count += 1;
+function updateState(draft: Draft<State>) {
+  draft.name = 'Updated'; // ✅ 可以修改
+  draft.items.push('new item'); // ✅ 可以修改
+}
+
+// ✅ 类型推导
+const [state, updateState] = useImmerState<State>({
+  id: '1',
+  name: 'Initial',
+  items: ['a', 'b'],
+});
+
+updateState((draft) => {
+  draft.name; // string
+  draft.items; // string[]
 });
 ```
 
-### 2. 性能优化
+### 3. 不可变检查
 
 ```typescript
-import { produce } from 'immer';
+// ✅ Immer 自动冻结状态（开发模式）
+import { setAutoFreeze } from 'immer';
 
-// 使用 recipe 函数重用
-const updateValue = (value: number) =>
-  produce((draft: State) => {
-    draft.value = value;
-  });
-
-const state1 = updateValue(10)(baseState);
-const state2 = updateValue(20)(baseState);
-```
-
-### 3. 异步操作
-
-```typescript
-import { produce } from 'immer';
-
-async function fetchAndUpdate(state: State) {
-  const data = await fetchData();
-
-  return produce(state, (draft) => {
-    draft.data = data;
-    draft.lastUpdated = Date.now();
-  });
-}
-```
-
-### 4. 冻结状态
-
-```typescript
-import { setAutoFreeze, freeze } from 'immer';
-
-// 全局启用冻结（开发环境）
+// 开发模式启用冻结
 if (process.env.NODE_ENV === 'development') {
   setAutoFreeze(true);
 }
 
-// 手动冻结对象
-const frozenState = freeze(state);
+// ❌ 禁用冻结（仅用于性能优化）
+// setAutoFreeze(false);
 ```
 
-### 5. 原始类型处理
+### 4. 错误处理
 
 ```typescript
-import { isDraft, original, Draft } from 'immer';
+// ✅ 捕获 Immer 错误
+try {
+  const nextState = produce(state, (draft) => {
+    // 可能抛出错误的操作
+    draft.items.push(mayThrow());
+  });
+} catch (error) {
+  console.error('Immer error:', error);
+}
 
-const nextState = produce(state, (draft) => {
-  // 检查是否为草稿
-  if (isDraft(draft.user)) {
-    // 获取原始对象
-    const originalUser = original(draft.user);
-    console.log('Original:', originalUser);
+// ✅ 验证状态
+import { isDraft, original } from 'immer';
+
+function safeUpdate(draft: Draft<State>) {
+  if (isDraft(draft)) {
+    const originalState = original(draft);
+    // 使用原始状态进行验证
   }
-});
+}
 ```
 
 ## 常用命令
 
 ```bash
-# 安装
+# 安装 Immer
 npm install immer
 
-# React hooks
+# 安装 React hooks
 npm install use-immer
 
-# Redux Toolkit（内置 Immer）
+# 安装 Redux Toolkit（内置 Immer）
 npm install @reduxjs/toolkit
 
-# Zustand（带 Immer 中间件）
-npm install zustand
-
-# 运行开发服务器
-npm run dev
+# TypeScript 支持（内置）
+# 无需额外安装
 
 # 测试
 npm test
-
-# 类型检查
-npm run type-check
 ```
 
-## 部署配置
+## API 参考
 
-### TypeScript 配置
-
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020"],
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  }
-}
-```
-
-### 环境变量
-
-```bash
-# .env.example
-NODE_ENV=production
-IMMER_AUTO_FREEZE=true
-```
-
-## 常见问题
-
-### 避免返回值
+### 核心函数
 
 ```typescript
-// ❌ 错误：不要返回
-const nextState = produce(state, (draft) => {
-  return { ...draft, count: 1 };
-});
-
-// ✅ 正确：直接修改
-const nextState = produce(state, (draft) => {
-  draft.count = 1;
-});
+produce              // 创建下一个状态
+produceWithPatches   // 创建状态并返回补丁
+enableMapSet         // 启用 Map/Set 支持
+enablePatches        // 启用补丁支持
+setAutoFreeze        // 设置自动冻结
+setUseProxies        // 设置使用 Proxy
 ```
 
-### 处理只读类型
+### 辅助函数
 
 ```typescript
-import { produce, Draft } from 'immer';
-
-interface ReadonlyState {
-  readonly items: readonly string[];
-}
-
-const nextState = produce(state as ReadonlyState, (draft: Draft<ReadonlyState>) => {
-  draft.items.push('new item');
-});
+isDraft              // 是否是 draft
+isDraftable          // 是否可 draft
+original             // 获取原始对象
+current              // 获取当前状态
+freeze               // 冻结对象
 ```
 
-### 性能优化技巧
+### 类型
 
 ```typescript
-import { produce } from 'immer';
-
-// 大数组优化
-const nextState = produce(state, (draft) => {
-  // 批量操作
-  draft.largeArray = draft.largeArray.filter(item => item.active);
-  
-  // 避免频繁操作
-  // ❌ draft.items.push(...Array(10000));
-  // ✅ draft.items = [...draft.items, ...Array(10000)];
-});
+Draft<T>             // Draft 类型
+Recipe<S>            // Recipe 函数类型
+Patch                // 补丁类型
 ```
 
-### 调试技巧
-
-```typescript
-import { produce, isDraft } from 'immer';
-
-const nextState = produce(state, (draft) => {
-  console.log('Is draft:', isDraft(draft));
-  console.log('Current state:', current(draft));
-  
-  draft.value += 1;
-});
-```
-
-## 相关资源
+## 扩展资源
 
 - [Immer 官方文档](https://immerjs.github.io/immer/)
 - [Immer GitHub](https://github.com/immerjs/immer)
-- [Redux Toolkit 文档](https://redux-toolkit.js.org/)
-- [Zustand 文档](https://github.com/pmndrs/zustand)
+- [use-immer](https://github.com/immerjs/use-immer)
+- [Redux Toolkit](https://redux-toolkit.js.org/)
+- [性能指南](https://immerjs.github.io/immer/docs/performance)
