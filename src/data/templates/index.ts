@@ -45,6 +45,10 @@ import rxjsContent from './rxjs.md'
 import taroContent from './taro.md'
 import fakerjsContent from './fakerjs.md'
 import cesiumContent from './cesium.md'
+import millionjsContent from './millionjs.md'
+import grapejsContent from './grapejs.md'
+import overmindContent from './overmind.md'
+import inertiajsContent from './inertiajs.md'
 
 export const templates: Template[] = [
   {
@@ -1292,6 +1296,130 @@ export const templates: Template[] = [
       copies: 44,
       stars: 22,
       forks: 6,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'millionjs',
+    name: 'Million.js Performance Optimization',
+    slug: 'millionjs',
+    description: 'Lightweight virtual DOM replacement for React that makes components up to 70% faster with minimal code changes',
+    content: millionjsContent,
+    tags: ['millionjs', 'react', 'performance', 'optimization', 'virtual-dom', 'rendering'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Million.js',
+      frameworkVersion: '3.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'React Testing Library'],
+    },
+    stats: {
+      views: 75,
+      copies: 38,
+      stars: 19,
+      forks: 5,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'grapejs',
+    name: 'Grape.js Rich Text Editor',
+    slug: 'grapejs',
+    description: 'Highly customizable, framework-agnostic rich text editor with modular architecture and plugin system',
+    content: grapejsContent,
+    tags: ['grapejs', 'editor', 'rich-text', 'wysiwyg', 'cms', 'content'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Grape.js',
+      frameworkVersion: '0.21+',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 68,
+      copies: 34,
+      stars: 17,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'overmind',
+    name: 'Overmind State Management',
+    slug: 'overmind',
+    description: 'Powerful state management library with built-in devtools, TypeScript support, and effect isolation',
+    content: overmindContent,
+    tags: ['overmind', 'state-management', 'react', 'vue', 'angular', 'typescript', 'devtools'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Overmind',
+      frameworkVersion: '2.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Jest'],
+    },
+    stats: {
+      views: 82,
+      copies: 41,
+      stars: 20,
+      forks: 5,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'inertiajs',
+    name: 'Inertia.js Full-Stack Framework',
+    slug: 'inertiajs',
+    description: 'Build single-page applications using classic server-side routing without building an API',
+    content: inertiajsContent,
+    tags: ['inertiajs', 'fullstack', 'laravel', 'rails', 'django', 'vue', 'react', 'svelte'],
+    category: TemplateCategory.FULLSTACK,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Inertia.js',
+      frameworkVersion: '1.x',
+      language: 'TypeScript / PHP / Ruby / Python',
+      languageVersion: '5.x / 8.x / 3.x / 3.11+',
+      testing: ['Vitest', 'PHPUnit', 'RSpec', 'pytest'],
+    },
+    stats: {
+      views: 95,
+      copies: 47,
+      stars: 24,
+      forks: 7,
     },
     status: TemplateStatus.PUBLISHED,
     featured: true,
