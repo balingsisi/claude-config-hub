@@ -1,377 +1,869 @@
-# NativeWind 模板
+# CLAUDE.md
 
-## 技术栈
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-- **核心**: NativeWind v4.x (Tailwind CSS for React Native)
-- **运行时**: React Native / Expo
-- **样式**: Tailwind CSS v3.x
-- **平台**: iOS, Android, Web
+## Project Overview
 
-## 项目结构
+**Project Name**: NativeWind Application
+**Type**: React Native with Tailwind CSS
+**Tech Stack**: React Native + NativeWind + Expo + TypeScript
+**Goal**: Cross-platform mobile app with Tailwind CSS styling
+
+---
+
+## Tech Stack
+
+### Core
+- **Framework**: React Native 0.73+
+- **Styling**: NativeWind 4.0 (Tailwind CSS for React Native)
+- **Runtime**: Expo SDK 50+
+- **Language**: TypeScript 5.3+
+
+### Navigation
+- **Router**: Expo Router 3.x (File-based)
+- **State**: Zustand / Jotai
+
+### Development
+- **Package Manager**: pnpm
+- **Testing**: Jest + React Native Testing Library
+- **Linting**: ESLint + Prettier
+
+---
+
+## Project Structure
 
 ```
 nativewind-app/
+├── app/
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   ├── (tabs)/
+│   │   ├── _layout.tsx
+│   │   ├── index.tsx
+│   │   ├── explore.tsx
+│   │   └── profile.tsx
+│   ├── (auth)/
+│   │   ├── login.tsx
+│   │   ├── register.tsx
+│   │   └── forgot-password.tsx
+│   ├── modal/
+│   │   └── settings.tsx
+│   └── post/
+│       └── [id].tsx
 ├── src/
 │   ├── components/
 │   │   ├── ui/
 │   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
 │   │   │   ├── Card.tsx
-│   │   │   └── Input.tsx
-│   │   └── layouts/
-│   │       └── Container.tsx
-│   ├── screens/
-│   │   ├── HomeScreen.tsx
-│   │   └── ProfileScreen.tsx
-│   ├── navigation/
-│   │   └── AppNavigator.tsx
+│   │   │   ├── Avatar.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Toast.tsx
+│   │   │   └── Skeleton.tsx
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── TabBar.tsx
+│   │   │   └── SafeArea.tsx
+│   │   └── features/
+│   │       ├── PostCard.tsx
+│   │       ├── UserList.tsx
+│   │       └── CommentSection.tsx
 │   ├── hooks/
-│   │   └── useTheme.ts
-│   ├── utils/
-│   │   └── cn.ts (className utility)
-│   └── types/
-│       └── index.ts
+│   │   ├── useTheme.ts
+│   │   ├── useAuth.ts
+│   │   ├── usePosts.ts
+│   │   └── useKeyboard.ts
+│   ├── lib/
+│   │   ├── api/
+│   │   │   ├── client.ts
+│   │   │   └── auth.ts
+│   │   └── utils/
+│   │       ├── cn.ts
+│   │       └── helpers.ts
+│   ├── stores/
+│   │   ├── useAuthStore.ts
+│   │   └── useThemeStore.ts
+│   ├── types/
+│   │   └── index.ts
+│   └── constants/
+│       └── theme.ts
+├── assets/
+│   ├── fonts/
+│   ├── images/
+│   └── icons/
 ├── tailwind.config.js
-├── babel.config.js
-├── metro.config.js
 ├── global.css
-├── app.json (Expo) / app.tsx (RN CLI)
+├── app.json
+├── metro.config.js
+├── babel.config.js
 └── package.json
 ```
 
-## 代码模式
+---
 
-### 基础组件样式
+## Coding Rules
 
-```typescript
-// src/components/ui/Button.tsx
-import { View, Text, Pressable } from 'react-native';
-import { styled } from 'nativewind';
-
-const StyledPressable = styled(Pressable);
-const StyledText = styled(Text);
-
-interface ButtonProps {
-  title: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary';
-  disabled?: boolean;
-}
-
-export function Button({ 
-  title, 
-  onPress, 
-  variant = 'primary',
-  disabled = false 
-}: ButtonProps) {
-  const baseStyles = 'px-6 py-3 rounded-lg items-center justify-center';
-  const variantStyles = {
-    primary: 'bg-blue-500 active:bg-blue-600',
-    secondary: 'bg-gray-200 active:bg-gray-300'
-  };
-  const textStyles = {
-    primary: 'text-white font-semibold',
-    secondary: 'text-gray-800 font-semibold'
-  };
-
-  return (
-    <StyledPressable
-      onPress={onPress}
-      disabled={disabled}
-      className={`${baseStyles} ${variantStyles[variant]} ${disabled ? 'opacity-50' : ''}`}
-    >
-      <StyledText className={textStyles[variant]}>
-        {title}
-      </StyledText>
-    </StyledPressable>
-  );
-}
-```
-
-### 条件样式
+### 1. NativeWind Setup
 
 ```typescript
-// src/components/ui/Card.tsx
-import { View, Text } from 'react-native';
-import { styled } from 'nativewind';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-
-interface CardProps {
-  title: string;
-  description?: string;
-  elevated?: boolean;
-}
-
-export function Card({ title, description, elevated = false }: CardProps) {
-  return (
-    <StyledView 
-      className={`
-        p-4 rounded-xl bg-white
-        ${elevated ? 'shadow-lg' : 'shadow-sm'}
-        border border-gray-200
-      `}
-    >
-      <StyledText className="text-lg font-bold text-gray-900">
-        {title}
-      </StyledText>
-      {description && (
-        <StyledText className="text-sm text-gray-600 mt-2">
-          {description}
-        </StyledText>
-      )}
-    </StyledView>
-  );
-}
-```
-
-### 响应式设计（跨平台）
-
-```typescript
-// src/screens/HomeScreen.tsx
-import { View, Text, useWindowDimensions } from 'react-native';
-import { styled } from 'nativewind';
-
-const StyledView = styled(View);
-const StyledText = styled(Text);
-
-export function HomeScreen() {
-  const { width } = useWindowDimensions();
-  const isLargeScreen = width >= 768;
-
-  return (
-    <StyledView 
-      className={`
-        flex-1 
-        ${isLargeScreen ? 'px-12' : 'px-4'}
-        py-8
-      `}
-    >
-      <StyledText 
-        className={`
-          font-bold 
-          ${isLargeScreen ? 'text-4xl' : 'text-2xl'}
-          text-gray-900
-        `}
-      >
-        Welcome to NativeWind
-      </StyledText>
-      
-      <StyledView className="flex-row flex-wrap mt-6">
-        {[1, 2, 3, 4].map((item) => (
-          <StyledView
-            key={item}
-            className={`
-              bg-blue-100 p-4 rounded-lg mb-4
-              ${isLargeScreen ? 'w-1/2 px-2' : 'w-full'}
-            `}
-          >
-            <StyledText className="text-blue-900">
-              Item {item}
-            </StyledText>
-          </StyledView>
-        ))}
-      </StyledView>
-    </StyledView>
-  );
-}
-```
-
-### 自定义工具函数
-
-```typescript
-// src/utils/cn.ts
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs: (string | undefined | null | false)[]): string {
-  return twMerge(inputs.filter(Boolean).join(' '));
-}
-
-// 使用示例
-import { cn } from '@/utils/cn';
-
-<View className={cn(
-  'p-4 rounded-lg',
-  isActive && 'bg-blue-500',
-  isDisabled && 'opacity-50'
-)}>
-```
-
-### 暗色模式支持
-
-```typescript
-// src/hooks/useTheme.ts
-import { useColorScheme } from 'react-native';
-
-export function useTheme() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  return {
-    isDark,
-    colorScheme,
-    colors: {
-      background: isDark ? 'bg-gray-900' : 'bg-white',
-      text: isDark ? 'text-white' : 'text-gray-900',
-      card: isDark ? 'bg-gray-800' : 'bg-gray-100',
-    }
-  };
-}
-
-// 使用
-function ThemedScreen() {
-  const { colors } = useTheme();
-  
-  return (
-    <StyledView className={`flex-1 ${colors.background}`}>
-      <StyledText className={colors.text}>
-        Themed Content
-      </StyledText>
-    </StyledView>
-  );
-}
-```
-
-## 最佳实践
-
-1. **样式组织**
-   - 使用 `styled()` 包装组件（NativeWind v4）
-   - 基础样式和变体样式分离
-   - 创建可复用的 UI 组件库
-
-2. **性能优化**
-   - 避免内联样式计算
-   - 使用 `memo()` 优化频繁渲染组件
-   - 静态样式优先于动态样式
-
-3. **类型安全**
-   - 为所有组件定义 TypeScript 接口
-   - 使用 `cn()` 工具函数处理条件样式
-   - 创建主题类型定义
-
-4. **响应式设计**
-   - 使用 `useWindowDimensions` 检测屏幕尺寸
-   - 移动优先，逐步增强到平板/桌面
-   - 测试不同设备和方向
-
-5. **可维护性**
-   - 使用 Tailwind 配置扩展自定义颜色/字体
-   - 建立设计系统（间距、颜色、字体规范）
-   - 样式命名遵循语义化
-
-## 常用命令
-
-### 开发
-
-```bash
-# 使用 Expo
-npx create-expo-app my-app -t expo-template-blank-typescript
-cd my-app
-npx expo install nativewind
-npx expo install tailwindcss@3.3.2
-
-# 初始化 Tailwind
-npx tailwindcss init
-
-# 启动开发服务器
-npx expo start
-
-# iOS 模拟器
-npx expo start --ios
-
-# Android 模拟器
-npx expo start --android
-
-# Web
-npx expo start --web
-```
-
-### 样式调试
-
-```bash
-# 查看 Tailwind 类名是否生效
-npx tailwindcss --content './src/**/*.{ts,tsx}' --output ./dist/styles.css
-
-# 清除缓存
-npx expo start --clear
-```
-
-### 构建
-
-```bash
-# EAS Build (Expo)
-eas build --platform ios
-eas build --platform android
-
-# 预览构建
-eas build --profile preview --platform ios
-```
-
-## 部署配置
-
-### tailwind.config.js
-
-```javascript
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './App.{js,jsx,ts,tsx}',
-    './src/**/*.{js,jsx,ts,tsx}',
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          500: '#3b82f6',
-          900: '#1e3a8a',
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
+        },
+        secondary: {
+          50: "#f5f3ff",
+          100: "#ede9fe",
+          200: "#ddd6fe",
+          300: "#c4b5fd",
+          400: "#a78bfa",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+          700: "#6d28d9",
+          800: "#5b21b6",
+          900: "#4c1d95",
+        },
+        background: {
+          light: "#ffffff",
+          dark: "#0a0a0a",
+        },
+        surface: {
+          light: "#f8f9fa",
+          dark: "#141414",
+        },
+        text: {
+          light: "#1a1a1a",
+          dark: "#f5f5f5",
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ["Inter", "system-ui"],
+        mono: ["JetBrainsMono", "monospace"],
+      },
+      spacing: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
       },
     },
   },
   plugins: [],
 };
-```
 
-### babel.config.js
-
-```javascript
-module.exports = function(api) {
+// babel.config.js
+module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
-    plugins: [
-      // NativeWind v4 需要的插件
-      'nativewind/babel',
+    presets: [
+      ["babel-preset-expo", { jsxImportSource: "nativewind" }],
+      "nativewind/babel",
     ],
   };
 };
-```
 
-### metro.config.js
-
-```javascript
-const { getDefaultConfig } = require('expo/metro-config');
+// metro.config.js
+const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 
 const config = getDefaultConfig(__dirname);
 
-module.exports = config;
+module.exports = withNativeWind(config, { input: "./global.css" });
 ```
 
-### global.css
+### 2. Global Styles
 
 ```css
+/* global.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #3b82f6;
+    --color-secondary: #8b5cf6;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 text-white py-3 px-6 rounded-lg font-semibold active:bg-primary-600;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-500 text-white py-3 px-6 rounded-lg font-semibold active:bg-secondary-600;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-500 py-3 px-6 rounded-lg font-semibold;
+  }
+
+  .card {
+    @apply bg-white dark:bg-surface-dark rounded-xl p-4 shadow-sm;
+  }
+
+  .input {
+    @apply bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-text-light dark:text-text-dark;
+  }
+}
 ```
 
-### app.json (Expo)
+### 3. Utility Functions
+
+```typescript
+// src/lib/utils/cn.ts
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// src/lib/utils/helpers.ts
+export function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: d.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+  });
+}
+
+export function truncate(str: string, length: number): string {
+  if (str.length <= length) return str;
+  return str.slice(0, length) + "...";
+}
+```
+
+### 4. UI Components
+
+```typescript
+// src/components/ui/Button.tsx
+import { Pressable, Text, ActivityIndicator, ViewStyle } from "react-native";
+import { cn } from "@/lib/utils/cn";
+
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
+type ButtonSize = "sm" | "md" | "lg";
+
+interface ButtonProps {
+  children: React.ReactNode;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+  className?: string;
+  onPress?: () => void;
+}
+
+const variantStyles: Record<ButtonVariant, string> = {
+  primary: "bg-primary-500 active:bg-primary-600",
+  secondary: "bg-secondary-500 active:bg-secondary-600",
+  outline: "bg-transparent border-2 border-primary-500",
+  ghost: "bg-transparent",
+};
+
+const textVariantStyles: Record<ButtonVariant, string> = {
+  primary: "text-white",
+  secondary: "text-white",
+  outline: "text-primary-500",
+  ghost: "text-primary-500",
+};
+
+const sizeStyles: Record<ButtonSize, string> = {
+  sm: "py-2 px-4 rounded-md",
+  md: "py-3 px-6 rounded-lg",
+  lg: "py-4 px-8 rounded-xl",
+};
+
+const textSizeStyles: Record<ButtonSize, string> = {
+  sm: "text-sm",
+  md: "text-base",
+  lg: "text-lg",
+};
+
+export function Button({
+  children,
+  variant = "primary",
+  size = "md",
+  disabled = false,
+  loading = false,
+  fullWidth = false,
+  className,
+  onPress,
+}: ButtonProps) {
+  const isDisabled = disabled || loading;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={isDisabled}
+      className={cn(
+        "flex-row items-center justify-center",
+        variantStyles[variant],
+        sizeStyles[size],
+        fullWidth && "w-full",
+        isDisabled && "opacity-50",
+        className
+      )}
+    >
+      {loading ? (
+        <ActivityIndicator
+          size="small"
+          color={variant === "outline" || variant === "ghost" ? "#3b82f6" : "#ffffff"}
+        />
+      ) : (
+        <Text
+          className={cn(
+            "font-semibold",
+            textVariantStyles[variant],
+            textSizeStyles[size]
+          )}
+        >
+          {children}
+        </Text>
+      )}
+    </Pressable>
+  );
+}
+
+// src/components/ui/Input.tsx
+import { useState } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  Pressable,
+  TextInputProps,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { cn } from "@/lib/utils/cn";
+
+interface InputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  leftIcon?: keyof typeof Ionicons.glyphMap;
+  rightIcon?: keyof typeof Ionicons.glyphMap;
+  onRightIconPress?: () => void;
+  containerClassName?: string;
+}
+
+export function Input({
+  label,
+  error,
+  leftIcon,
+  rightIcon,
+  onRightIconPress,
+  containerClassName,
+  className,
+  secureTextEntry,
+  ...props
+}: InputProps) {
+  const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <View className={cn("mb-4", containerClassName)}>
+      {label && (
+        <Text className="text-sm font-medium text-text-light dark:text-text-dark mb-2">
+          {label}
+        </Text>
+      )}
+      <View
+        className={cn(
+          "flex-row items-center bg-surface-light dark:bg-surface-dark border rounded-lg px-4",
+          isFocused ? "border-primary-500" : "border-gray-200 dark:border-gray-700",
+          error && "border-red-500"
+        )}
+      >
+        {leftIcon && (
+          <Ionicons
+            name={leftIcon}
+            size={20}
+            className="mr-3 text-gray-400"
+            color="#9ca3af"
+          />
+        )}
+        <TextInput
+          className={cn(
+            "flex-1 py-3 text-text-light dark:text-text-dark",
+            className
+          )}
+          placeholderTextColor="#9ca3af"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          secureTextEntry={secureTextEntry && !showPassword}
+          {...props}
+        />
+        {secureTextEntry && (
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={20}
+              color="#9ca3af"
+            />
+          </Pressable>
+        )}
+        {rightIcon && !secureTextEntry && (
+          <Pressable onPress={onRightIconPress}>
+            <Ionicons name={rightIcon} size={20} color="#9ca3af" />
+          </Pressable>
+        )}
+      </View>
+      {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
+    </View>
+  );
+}
+
+// src/components/ui/Card.tsx
+import { View, ViewStyle } from "react-native";
+import { cn } from "@/lib/utils/cn";
+
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+  variant?: "elevated" | "outlined" | "filled";
+}
+
+const variantStyles = {
+  elevated: "bg-white dark:bg-surface-dark shadow-md",
+  outlined: "bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700",
+  filled: "bg-surface-light dark:bg-surface-dark",
+};
+
+export function Card({ children, className, variant = "elevated" }: CardProps) {
+  return (
+    <View
+      className={cn(
+        "rounded-xl p-4",
+        variantStyles[variant],
+        className
+      )}
+    >
+      {children}
+    </View>
+  );
+}
+
+// src/components/ui/Avatar.tsx
+import { View, Image, Text } from "react-native";
+import { cn } from "@/lib/utils/cn";
+
+interface AvatarProps {
+  source?: { uri: string } | number;
+  name?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
+}
+
+const sizeStyles = {
+  sm: "w-8 h-8",
+  md: "w-12 h-12",
+  lg: "w-16 h-16",
+  xl: "w-24 h-24",
+};
+
+const textSizeStyles = {
+  sm: "text-xs",
+  md: "text-base",
+  lg: "text-xl",
+  xl: "text-3xl",
+};
+
+export function Avatar({ source, name, size = "md", className }: AvatarProps) {
+  const initials = name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <View
+      className={cn(
+        "rounded-full bg-primary-500 items-center justify-center overflow-hidden",
+        sizeStyles[size],
+        className
+      )}
+    >
+      {source ? (
+        <Image
+          source={source}
+          className="w-full h-full"
+          resizeMode="cover"
+        />
+      ) : (
+        <Text
+          className={cn(
+            "text-white font-semibold",
+            textSizeStyles[size]
+          )}
+        >
+          {initials || "?"}
+        </Text>
+      )}
+    </View>
+  );
+}
+```
+
+### 5. Theme Hook
+
+```typescript
+// src/hooks/useTheme.ts
+import { useColorScheme } from "react-native";
+import { useThemeStore } from "@/stores/useThemeStore";
+
+export function useTheme() {
+  const systemColorScheme = useColorScheme();
+  const { theme, setTheme } = useThemeStore();
+
+  const colorScheme = theme === "system" ? systemColorScheme : theme;
+  const isDark = colorScheme === "dark";
+
+  return {
+    theme,
+    colorScheme,
+    isDark,
+    setTheme,
+    toggleTheme: () => {
+      setTheme(isDark ? "light" : "dark");
+    },
+  };
+}
+
+// src/stores/useThemeStore.ts
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+type Theme = "light" | "dark" | "system";
+
+interface ThemeState {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}
+
+export const useThemeStore = create<ThemeState>()(
+  persist(
+    (set) => ({
+      theme: "system",
+      setTheme: (theme) => set({ theme }),
+    }),
+    {
+      name: "theme-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+```
+
+### 6. Auth Store and Hook
+
+```typescript
+// src/stores/useAuthStore.ts
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+interface User {
+  id: string;
+  email: string;
+  username: string;
+  avatar?: string;
+}
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
+  logout: () => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: !!user,
+        }),
+      setToken: (token) => set({ token }),
+      logout: () =>
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+        }),
+    }),
+    {
+      name: "auth-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
+  )
+);
+
+// src/hooks/useAuth.ts
+import { useAuthStore } from "@/stores/useAuthStore";
+import { api } from "@/lib/api/client";
+import * as SecureStore from "expo-secure-store";
+
+export function useAuth() {
+  const { user, token, isAuthenticated, setUser, setToken, logout } = useAuthStore();
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      const { user, accessToken, refreshToken } = response.data;
+
+      await SecureStore.setItemAsync("refreshToken", refreshToken);
+      setToken(accessToken);
+      setUser(user);
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Login failed",
+      };
+    }
+  };
+
+  const register = async (data: { email: string; username: string; password: string }) => {
+    try {
+      const response = await api.post("/auth/register", data);
+      const { user, accessToken, refreshToken } = response.data;
+
+      await SecureStore.setItemAsync("refreshToken", refreshToken);
+      setToken(accessToken);
+      setUser(user);
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Registration failed",
+      };
+    }
+  };
+
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("refreshToken");
+    logout();
+  };
+
+  return {
+    user,
+    token,
+    isAuthenticated,
+    login,
+    register,
+    logout: handleLogout,
+  };
+}
+```
+
+### 7. Screen Examples
+
+```typescript
+// app/(tabs)/index.tsx
+import { View, Text, FlatList, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { usePosts } from "@/hooks/usePosts";
+import { PostCard } from "@/components/features/PostCard";
+import { Button } from "@/components/ui/Button";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+
+export default function HomeScreen() {
+  const { posts, loading, error, refetch, loadMore, hasMore } = usePosts();
+
+  if (loading && posts.length === 0) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 items-center justify-center bg-background-light dark:bg-background-dark">
+        <Text className="text-red-500 mb-4">{error}</Text>
+        <Button onPress={refetch}>Try Again</Button>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-background-dark">
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <PostCard post={item} />}
+        contentContainerClassName="p-4 gap-4"
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refetch} />
+        }
+        onEndReached={() => hasMore && loadMore()}
+        onEndReachedThreshold={0.5}
+        ListEmptyComponent={
+          <View className="flex-1 items-center justify-center py-12">
+            <Text className="text-gray-500 text-lg">No posts yet</Text>
+          </View>
+        }
+        ListFooterComponent={
+          loading && posts.length > 0 ? (
+            <LoadingSpinner size="small" />
+          ) : null
+        }
+      />
+    </SafeAreaView>
+  );
+}
+
+// app/(auth)/login.tsx
+import { useState } from "react";
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/hooks/useAuth";
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    const result = await login(email, password);
+
+    setLoading(false);
+
+    if (result.success) {
+      router.replace("/(tabs)");
+    } else {
+      setError(result.error || "Login failed");
+    }
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-background-dark">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          className="px-6"
+        >
+          <View className="flex-1 justify-center py-12">
+            <Text className="text-3xl font-bold text-text-light dark:text-text-dark mb-2">
+              Welcome back
+            </Text>
+            <Text className="text-gray-500 mb-8">
+              Sign in to continue
+            </Text>
+
+            <Input
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              leftIcon="mail"
+            />
+
+            <Input
+              label="Password"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              leftIcon="lock-closed"
+            />
+
+            {error && (
+              <Text className="text-red-500 text-center mb-4">{error}</Text>
+            )}
+
+            <Button
+              onPress={handleLogin}
+              loading={loading}
+              fullWidth
+              className="mt-4"
+            >
+              Sign In
+            </Button>
+
+            <Button
+              variant="ghost"
+              onPress={() => router.push("/(auth)/register")}
+              className="mt-4"
+            >
+              Don't have an account? Sign up
+            </Button>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+```
+
+---
+
+## App Configuration
 
 ```json
+// app.json
 {
   "expo": {
     "name": "NativeWind App",
@@ -379,92 +871,105 @@ module.exports = config;
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "nativewindapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3b82f6"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.nativewind"
+      "bundleIdentifier": "com.example.nativewindapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#3b82f6"
       },
-      "package": "com.example.nativewind"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "package": "com.example.nativewindapp"
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
 ```
 
-### package.json 脚本
+---
 
-```json
-{
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build:ios": "eas build --platform ios",
-    "build:android": "eas build --platform android",
-    "lint": "eslint . --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
-  },
-  "dependencies": {
-    "expo": "~50.0.0",
-    "expo-status-bar": "~1.11.1",
-    "nativewind": "^4.0.0",
-    "react": "18.2.0",
-    "react-native": "0.73.2",
-    "tailwindcss": "3.3.2"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@types/react": "~18.2.45",
-    "typescript": "^5.1.3"
-  }
-}
+## Environment Variables
+
+```bash
+# .env
+
+# API
+API_URL=http://localhost:3000/api
+
+# Auth (Optional)
+AUTH_SECRET=your-secret-key
+
+# Sentry (Optional)
+SENTRY_DSN=https://xxx@sentry.io/xxx
+
+# Environment
+ENV=development
 ```
 
-## 注意事项
+---
 
-1. **NativeWind v4 变化**
-   - 必须使用 `styled()` 包装组件
-   - 不再支持直接在组件上使用 `className`
-   - 需要配置 Babel 插件
+## Common Commands
 
-2. **Tailwind 版本**
-   - 推荐使用 Tailwind CSS v3.x
-   - v4 支持仍在开发中
+```bash
+# Development
+pnpm start
+pnpm android
+pnpm ios
+pnpm web
 
-3. **性能考虑**
-   - 动态样式会创建新组件，避免在渲染中使用
-   - 使用静态类名字符串性能最佳
+# Build
+pnpm build:android
+pnpm build:ios
 
-4. **跨平台差异**
-   - 某些 CSS 特性在 React Native 不支持（如 `display: grid`）
-   - 使用 Flexbox 布局
-   - 测试所有目标平台
+# Lint
+pnpm lint
+pnpm lint:fix
 
-5. **调试**
-   - 使用 React Native Debugger
-   - 检查样式是否正确应用
-   - 确认 Tailwind 配置的 content 路径正确
+# Test
+pnpm test
+pnpm test:watch
 
-## 相关资源
+# Expo
+pnpm expo:install <package>
+pnpm expo:update
+pnpm expo:doctor
 
-- [NativeWind 文档](https://www.nativewind.dev/)
-- [Tailwind CSS 文档](https://tailwindcss.com/)
-- [React Native 样式文档](https://reactnative.dev/docs/style)
-- [Expo 文档](https://docs.expo.dev/)
+# NativeWind
+pnpm nativewind:generate
+
+# Clear cache
+pnpm clear-cache
+```
+
+---
+
+## Deployment Checklist
+
+- [ ] Configure app.json with correct bundle ID
+- [ ] Set up app icons and splash screens
+- [ ] Configure deep linking
+- [ ] Set up push notifications (if needed)
+- [ ] Configure environment variables
+- [ ] Test on both iOS and Android
+- [ ] Set up error tracking (Sentry)
+- [ ] Configure app signing
+- [ ] Test performance on low-end devices
+- [ ] Review bundle size
+- [ ] Test offline functionality
+- [ ] Configure analytics
+- [ ] Submit to App Store / Play Store
+- [ ] Set up CI/CD for builds
