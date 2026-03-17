@@ -1,37 +1,44 @@
-# Video.js 模板
+# Video.js 播放器模板
 
 ## 技术栈
-- **Video.js** - 开源 HTML5 视频播放器框架
-- **TypeScript** - 完整类型支持
-- **React** - React 集成（可选）
-- **Video.js Plugins** - 插件生态系统
-- **HLS.js** - HLS 流媒体支持
-- **DASH** - MPEG-DASH 支持
+
+- **核心**: Video.js 8.x
+- **格式支持**: HTML5 Video / HLS / DASH / YouTube / Vimeo
+- **插件**: videojs-hls / videojs-contrib-ads / videojs-ima
+- **主题**: Video.js Skins / 自定义 CSS
+- **功能**: 广告 / 分析 / 字幕 / 360° 视频
 
 ## 项目结构
+
 ```
 videojs-project/
 ├── src/
 │   ├── components/
-│   │   ├── VideoPlayer.tsx
-│   │   ├── VideoPlayerControls.tsx
-│   │   └── VideoPlayerPlugins.tsx
-│   ├── players/
-│   │   ├── BasicPlayer.ts
-│   │   ├── HLSPlayer.ts
-│   │   └── DASHPlayer.ts
+│   │   ├── VideoPlayer.tsx        # 主播放器
+│   │   ├── HLSPlayer.tsx          # HLS 流媒体
+│   │   ├── DASHPlayer.tsx         # DASH 流媒体
+│   │   ├── YouTubePlayer.tsx      # YouTube 播放器
+│   │   ├── AdsPlayer.tsx          # 广告播放器
+│   │   └── VRPlayer.tsx           # 360° 视频
 │   ├── plugins/
-│   │   ├── watermark.ts
-│   │   ├── analytics.ts
-│   │   └── quality-selector.ts
-│   ├── styles/
-│   │   └── video-player.scss
-│   ├── types/
-│   │   └── index.ts
-│   ├── App.tsx
-│   └── main.tsx
+│   │   ├── watermark.ts           # 水印插件
+│   │   ├── hotkeys.ts             # 快捷键插件
+│   │   ├── seekButtons.ts         # 跳转按钮
+│   │   └── overlay.ts             # 覆盖层插件
+│   ├── themes/
+│   │   ├── netflix.css            # Netflix 主题
+│   │   ├── youtube.css            # YouTube 主题
+│   │   └── minimal.css            # 极简主题
+│   ├── hooks/
+│   │   ├── useVideoJS.ts          # Video.js hook
+│   │   └── usePlayerEvents.ts     # 事件 hook
+│   └── utils/
+│       ├── analytics.ts           # 分析工具
+│       ├── qualityLevels.ts       # 画质管理
+│       └── storage.ts             # 本地存储
 ├── public/
-│   └── videos/
+│   ├── videos/                    # 视频文件
+│   └── subtitles/                 # 字幕文件
 ├── package.json
 └── tsconfig.json
 ```
@@ -39,888 +46,891 @@ videojs-project/
 ## 代码模式
 
 ### 基础播放器
+
 ```typescript
-// src/players/BasicPlayer.ts
+// components/VideoPlayer.tsx
+import React, { useEffect, useRef } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-import Player from 'video.js/dist/types/player';
 
-export interface VideoPlayerOptions {
-  controls?: boolean;
-  autoplay?: boolean | 'play' | 'muted' | 'any';
-  preload?: 'auto' | 'metadata' | 'none';
-  loop?: boolean;
-  muted?: boolean;
-  fluid?: boolean;
-  responsive?: boolean;
-  playbackRates?: number[];
-  poster?: string;
-  sources?: Array<{
-    src: string;
-    type: string;
-  }>;
-}
-
-export class BasicPlayer {
-  private player: Player | null = null;
-  private videoElement: HTMLVideoElement;
-
-  constructor(element: HTMLVideoElement, options: VideoPlayerOptions = {}) {
-    this.videoElement = element;
-    this.init(options);
-  }
-
-  private init(options: VideoPlayerOptions) {
-    const defaultOptions: VideoPlayerOptions = {
-      controls: true,
-      autoplay: false,
-      preload: 'auto',
-      fluid: true,
-      playbackRates: [0.5, 1, 1.5, 2],
-      ...options,
-    };
-
-    this.player = videojs(this.videoElement, defaultOptions, () => {
-      console.log('Player is ready');
-      this.onReady();
-    });
-  }
-
-  private onReady() {
-    if (!this.player) return;
-
-    // 播放事件
-    this.player.on('play', () => {
-      console.log('Video started playing');
-    });
-
-    this.player.on('pause', () => {
-      console.log('Video paused');
-    });
-
-    this.player.on('ended', () => {
-      console.log('Video ended');
-    });
-
-    // 时间更新
-    this.player.on('timeupdate', () => {
-      const currentTime = this.player?.currentTime();
-      const duration = this.player?.duration();
-      console.log(`Time: ${currentTime} / ${duration}`);
-    });
-
-    // 错误处理
-    this.player.on('error', () => {
-      const error = this.player?.error();
-      console.error('Video error:', error);
-    });
-  }
-
-  // 播放控制
-  play() {
-    this.player?.play();
-  }
-
-  pause() {
-    this.player?.pause();
-  }
-
-  stop() {
-    this.player?.pause();
-    this.player?.currentTime(0);
-  }
-
-  // 跳转
-  seek(time: number) {
-    this.player?.currentTime(time);
-  }
-
-  // 音量控制
-  setVolume(volume: number) {
-    this.player?.volume(Math.max(0, Math.min(1, volume)));
-  }
-
-  mute() {
-    this.player?.muted(true);
-  }
-
-  unmute() {
-    this.player?.muted(false);
-  }
-
-  // 全屏
-  requestFullscreen() {
-    this.player?.requestFullscreen();
-  }
-
-  exitFullscreen() {
-    this.player?.exitFullscreen();
-  }
-
-  // 播放速度
-  setPlaybackRate(rate: number) {
-    this.player?.playbackRate(rate);
-  }
-
-  // 获取信息
-  getCurrentTime(): number {
-    return this.player?.currentTime() || 0;
-  }
-
-  getDuration(): number {
-    return this.player?.duration() || 0;
-  }
-
-  getBuffered(): TimeRanges | undefined {
-    return this.player?.buffered();
-  }
-
-  // 销毁
-  dispose() {
-    if (this.player) {
-      this.player.dispose();
-      this.player = null;
-    }
-  }
-}
-```
-
-### React 组件
-```typescript
-// src/components/VideoPlayer.tsx
-import { useEffect, useRef, useCallback } from 'react';
-import videojs from 'video.js';
-import Player from 'video.js/dist/types/player';
-import 'video.js/dist/video-js.css';
-
-export interface VideoPlayerProps {
+interface VideoPlayerProps {
   options: videojs.PlayerOptions;
-  onReady?: (player: Player) => void;
+  onReady?: (player: videojs.Player) => void;
   onPlay?: () => void;
   onPause?: () => void;
-  onEnded?: () => void;
-  onTimeUpdate?: (currentTime: number, duration: number) => void;
-  onError?: (error: any) => void;
+  onEnd?: () => void;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
-export function VideoPlayer({
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   options,
   onReady,
   onPlay,
   onPause,
-  onEnded,
+  onEnd,
   onTimeUpdate,
-  onError,
-}: VideoPlayerProps) {
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const playerRef = useRef<Player | null>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
 
   useEffect(() => {
     if (!videoRef.current) return;
 
-    // 初始化播放器
-    if (!playerRef.current) {
-      const player = videojs(videoRef.current, options, () => {
-        console.log('Player is ready');
-        onReady?.(player);
-      });
+    // 初始化 Video.js
+    playerRef.current = videojs(videoRef.current, {
+      controls: true,
+      autoplay: false,
+      preload: 'auto',
+      fluid: true,
+      responsive: true,
+      playbackRates: [0.5, 1, 1.25, 1.5, 2],
+      controlBar: {
+        children: [
+          'playToggle',
+          'volumePanel',
+          'currentTimeDisplay',
+          'timeDivider',
+          'durationDisplay',
+          'progressControl',
+          'playbackRateMenuButton',
+          'fullscreenToggle',
+        ],
+      },
+      ...options,
+    });
 
-      playerRef.current = player;
-    }
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        playerRef.current = null;
-      }
-    };
-  }, [options]);
-
-  // 事件监听
-  useEffect(() => {
     const player = playerRef.current;
-    if (!player) return;
+
+    // 事件监听
+    if (onReady) {
+      player.ready(() => {
+        onReady(player);
+      });
+    }
 
     if (onPlay) {
       player.on('play', onPlay);
     }
+
     if (onPause) {
       player.on('pause', onPause);
     }
-    if (onEnded) {
-      player.on('ended', onEnded);
+
+    if (onEnd) {
+      player.on('ended', onEnd);
     }
+
     if (onTimeUpdate) {
       player.on('timeupdate', () => {
-        const currentTime = player.currentTime() || 0;
-        const duration = player.duration() || 0;
-        onTimeUpdate(currentTime, duration);
-      });
-    }
-    if (onError) {
-      player.on('error', () => {
-        onError(player.error());
+        onTimeUpdate(player.currentTime() || 0);
       });
     }
 
     return () => {
-      if (onPlay) player.off('play', onPlay);
-      if (onPause) player.off('pause', onPause);
-      if (onEnded) player.off('ended', onEnded);
-      if (onTimeUpdate) player.off('timeupdate');
-      if (onError) player.off('error');
+      if (player && !player.isDisposed()) {
+        player.dispose();
+      }
     };
-  }, [onPlay, onPause, onEnded, onTimeUpdate, onError]);
+  }, [options]);
 
   return (
     <div data-vjs-player>
       <video
         ref={videoRef}
         className="video-js vjs-big-play-centered vjs-theme-city"
-        playsInline
       />
+    </div>
+  );
+};
+
+// 使用示例
+function App() {
+  const playerOptions = {
+    sources: [
+      {
+        src: '/videos/demo.mp4',
+        type: 'video/mp4',
+      },
+    ],
+    poster: '/images/poster.jpg',
+    tracks: [
+      {
+        kind: 'captions',
+        src: '/subtitles/en.vtt',
+        srclang: 'en',
+        label: 'English',
+        default: true,
+      },
+      {
+        kind: 'captions',
+        src: '/subtitles/zh.vtt',
+        srclang: 'zh',
+        label: '中文',
+      },
+    ],
+  };
+
+  return (
+    <VideoPlayer
+      options={playerOptions}
+      onReady={(player) => console.log('Player ready', player)}
+      onPlay={() => console.log('Playing')}
+      onPause={() => console.log('Paused')}
+    />
+  );
+}
+```
+
+### React Hook
+
+```typescript
+// hooks/useVideoJS.ts
+import { useEffect, useRef, useState } from 'react';
+import videojs from 'video.js';
+
+interface UseVideoJSOptions {
+  sources: Array<{ src: string; type: string }>;
+  poster?: string;
+  autoplay?: boolean;
+  controls?: boolean;
+  responsive?: boolean;
+  fluid?: boolean;
+}
+
+export function useVideoJS(options: UseVideoJSOptions) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    playerRef.current = videojs(videoRef.current, options);
+
+    const player = playerRef.current;
+
+    player.ready(() => {
+      setIsReady(true);
+    });
+
+    player.on('play', () => setIsPlaying(true));
+    player.on('pause', () => setIsPlaying(false));
+    player.on('timeupdate', () => setCurrentTime(player.currentTime() || 0));
+    player.on('loadedmetadata', () => setDuration(player.duration() || 0));
+    player.on('volumechange', () => {
+      setVolume(player.volume());
+      setMuted(player.muted());
+    });
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+      }
+    };
+  }, []);
+
+  // 控制方法
+  const play = () => playerRef.current?.play();
+  const pause = () => playerRef.current?.pause();
+  const seek = (time: number) => playerRef.current?.currentTime(time);
+  const setPlayerVolume = (vol: number) => playerRef.current?.volume(vol);
+  const toggleMute = () => playerRef.current?.muted(!muted);
+  const enterFullscreen = () => playerRef.current?.requestFullscreen();
+  const exitFullscreen = () => playerRef.current?.exitFullscreen();
+
+  return {
+    videoRef,
+    player: playerRef.current,
+    isReady,
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    muted,
+    play,
+    pause,
+    seek,
+    setVolume: setPlayerVolume,
+    toggleMute,
+    enterFullscreen,
+    exitFullscreen,
+  };
+}
+
+// 使用示例
+function CustomPlayer() {
+  const {
+    videoRef,
+    isPlaying,
+    currentTime,
+    duration,
+    play,
+    pause,
+    seek,
+  } = useVideoJS({
+    sources: [{ src: '/video.mp4', type: 'video/mp4' }],
+    controls: false,
+  });
+
+  return (
+    <div>
+      <video ref={videoRef} className="video-js" />
+      
+      <div className="custom-controls">
+        <button onClick={isPlaying ? pause : play}>
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+        
+        <input
+          type="range"
+          min={0}
+          max={duration}
+          value={currentTime}
+          onChange={(e) => seek(Number(e.target.value))}
+        />
+      </div>
     </div>
   );
 }
 ```
 
-### HLS 流媒体播放器
-```typescript
-// src/players/HLSPlayer.ts
-import videojs from 'video.js';
-import 'videojs-contrib-quality-levels';
-import 'videojs-hls-quality-selector';
-import { BasicPlayer, VideoPlayerOptions } from './BasicPlayer';
+### HLS 流媒体
 
-export interface HLSPlayerOptions extends VideoPlayerOptions {
-  hls?: {
-    overrideNative?: boolean;
-    enableLowInitialPlaylist?: boolean;
-    smoothQualityChange?: boolean;
-    fastQualityChange?: boolean;
-  };
+```typescript
+// components/HLSPlayer.tsx
+import React, { useEffect, useRef } from 'react';
+import videojs from 'video.js';
+import 'videojs-contrib-quality-menu';
+import 'videojs-hls-support';
+
+interface HLSPlayerProps {
+  src: string;
+  poster?: string;
 }
 
-export class HLSPlayer extends BasicPlayer {
-  constructor(element: HTMLVideoElement, options: HLSPlayerOptions = {}) {
-    const hlsOptions: HLSPlayerOptions = {
-      ...options,
+export const HLSPlayer: React.FC<HLSPlayerProps> = ({ src, poster }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    playerRef.current = videojs(videoRef.current, {
+      sources: [
+        {
+          src,
+          type: 'application/x-mpegURL',
+        },
+      ],
+      poster,
       html5: {
         vhs: {
-          overrideNative: options.hls?.overrideNative ?? true,
-          enableLowInitialPlaylist: options.hls?.enableLowInitialPlaylist ?? true,
-          smoothQualityChange: options.hls?.smoothQualityChange ?? true,
-          fastQualityChange: options.hls?.fastQualityChange ?? true,
+          overrideNative: true,
+          enableLowInitialPlaylist: true,
+          smoothQualityChange: true,
+          fastQualityChange: true,
         },
         nativeAudioTracks: false,
         nativeVideoTracks: false,
       },
-    };
+      plugins: {
+        qualityMenu: {},
+      },
+    });
 
-    super(element, hlsOptions);
-  }
-}
+    const player = playerRef.current;
+
+    // 监听质量变化
+    player.on('loadedmetadata', () => {
+      const qualityLevels = player.qualityLevels();
+      
+      console.log('Available quality levels:', qualityLevels.length);
+      
+      qualityLevels.on('change', () => {
+        console.log('Quality changed');
+      });
+    });
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+      }
+    };
+  }, [src]);
+
+  return (
+    <div data-vjs-player>
+      <video ref={videoRef} className="video-js vjs-theme-city" />
+    </div>
+  );
+};
+
+// 使用示例
+<HLSPlayer
+  src="https://example.com/stream.m3u8"
+  poster="/poster.jpg"
+/>
 ```
 
-### DASH 流媒体播放器
-```typescript
-// src/players/DASHPlayer.ts
-import videojs from 'video.js';
-import 'videojs-contrib-dash';
-import { BasicPlayer, VideoPlayerOptions } from './BasicPlayer';
+### DASH 流媒体
 
-export interface DASHPlayerOptions extends VideoPlayerOptions {
-  dash?: {
-    limitBitrateByPortal?: boolean;
-    initialBitrate?: {
-      video: number;
-      audio: number;
-    };
-  };
+```typescript
+// components/DASHPlayer.tsx
+import React, { useEffect, useRef } from 'react';
+import videojs from 'video.js';
+import 'dashjs';
+
+interface DASHPlayerProps {
+  src: string;
+  poster?: string;
 }
 
-export class DASHPlayer extends DASHPlayerOptions {
-  constructor(element: HTMLVideoElement, options: DASHPlayerOptions = {}) {
-    const dashOptions: DASHPlayerOptions = {
-      ...options,
+export const DASHPlayer: React.FC<DASHPlayerProps> = ({ src, poster }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    playerRef.current = videojs(videoRef.current, {
+      sources: [
+        {
+          src,
+          type: 'application/dash+xml',
+        },
+      ],
+      poster,
       html5: {
-        ...options.html5,
         dash: {
-          limitBitrateByPortal: options.dash?.limitBitrateByPortal ?? true,
-          initialBitrate: options.dash?.initialBitrate ?? {
-            video: 1000,
-            audio: 128,
-          },
+          overrideNative: true,
         },
       },
-    };
+    });
 
-    super(element, dashOptions);
-  }
+    const player = playerRef.current;
+
+    // 监听质量变化
+    player.on('loadedmetadata', () => {
+      const qualityLevels = player.qualityLevels();
+      
+      qualityLevels.on('change', () => {
+        console.log('Quality changed');
+      });
+    });
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+      }
+    };
+  }, [src]);
+
+  return (
+    <div data-vjs-player>
+      <video ref={videoRef} className="video-js" />
+    </div>
+  );
+};
+```
+
+### 广告集成
+
+```typescript
+// components/AdsPlayer.tsx
+import React, { useEffect, useRef } from 'react';
+import videojs from 'video.js';
+import 'videojs-contrib-ads';
+import 'videojs-ima';
+
+interface AdsPlayerProps {
+  contentSrc: string;
+  adTagUrl: string;
 }
+
+export const AdsPlayer: React.FC<AdsPlayerProps> = ({
+  contentSrc,
+  adTagUrl,
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    playerRef.current = videojs(videoRef.current, {
+      sources: [{ src: contentSrc, type: 'video/mp4' }],
+    });
+
+    const player = playerRef.current;
+
+    // 初始化广告
+    player.ima({
+      adTagUrl,
+      debug: true,
+    });
+
+    // 广告事件
+    player.on('adsready', () => {
+      console.log('Ads ready');
+    });
+
+    player.on('adsstart', () => {
+      console.log('Ad started');
+    });
+
+    player.on('adsend', () => {
+      console.log('Ad ended');
+    });
+
+    player.on('adskip', () => {
+      console.log('Ad skipped');
+    });
+
+    return () => {
+      if (player && !player.isDisposed()) {
+        player.dispose();
+      }
+    };
+  }, [contentSrc, adTagUrl]);
+
+  return (
+    <div data-vjs-player>
+      <video ref={videoRef} className="video-js" />
+    </div>
+  );
+};
 ```
 
 ### 自定义插件
+
 ```typescript
-// src/plugins/watermark.ts
+// plugins/watermark.ts
 import videojs from 'video.js';
 
 const Plugin = videojs.getPlugin('plugin');
 
-interface WatermarkOptions {
-  image?: string;
-  text?: string;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-  opacity?: number;
-  margin?: number;
-}
-
-class Watermark extends Plugin {
-  private watermarkElement: HTMLDivElement | null = null;
-
-  constructor(player: videojs.Player, options: WatermarkOptions = {}) {
+class WatermarkPlugin extends Plugin {
+  constructor(player: videojs.Player, options: any) {
     super(player, options);
 
-    this.createWatermark(options);
-  }
+    const watermark = videojs.dom.createEl('div', {
+      className: 'vjs-watermark',
+      innerHTML: options.text || '',
+    });
 
-  private createWatermark(options: WatermarkOptions) {
-    const {
-      image,
-      text,
-      position = 'bottom-right',
-      opacity = 0.5,
-      margin = 10,
-    } = options;
-
-    this.watermarkElement = document.createElement('div');
-    this.watermarkElement.className = 'vjs-watermark';
-
-    // 样式
-    Object.assign(this.watermarkElement.style, {
+    Object.assign(watermark.style, {
       position: 'absolute',
-      opacity: opacity.toString(),
-      zIndex: '10',
-      ...this.getPositionStyles(position, margin),
+      bottom: '50px',
+      right: '20px',
+      color: 'rgba(255, 255, 255, 0.5)',
+      fontSize: '14px',
+      fontFamily: 'Arial',
+      pointerEvents: 'none',
+      zIndex: 1,
     });
 
-    if (image) {
-      const img = document.createElement('img');
-      img.src = image;
-      img.style.maxWidth = '100px';
-      img.style.maxHeight = '50px';
-      this.watermarkElement.appendChild(img);
-    } else if (text) {
-      this.watermarkElement.textContent = text;
-      this.watermarkElement.style.color = 'white';
-      this.watermarkElement.style.fontSize = '14px';
-      this.watermarkElement.style.textShadow = '1px 1px 2px black';
-    }
-
-    this.player.el().appendChild(this.watermarkElement);
-  }
-
-  private getPositionStyles(
-    position: string,
-    margin: number
-  ): Partial<CSSStyleDeclaration> {
-    const styles: any = {};
-
-    switch (position) {
-      case 'top-left':
-        styles.top = `${margin}px`;
-        styles.left = `${margin}px`;
-        break;
-      case 'top-right':
-        styles.top = `${margin}px`;
-        styles.right = `${margin}px`;
-        break;
-      case 'bottom-left':
-        styles.bottom = `${margin}px`;
-        styles.left = `${margin}px`;
-        break;
-      case 'bottom-right':
-        styles.bottom = `${margin}px`;
-        styles.right = `${margin}px`;
-        break;
-    }
-
-    return styles;
-  }
-
-  dispose() {
-    if (this.watermarkElement) {
-      this.watermarkElement.remove();
-      this.watermarkElement = null;
-    }
-    super.dispose();
+    player.el().appendChild(watermark);
   }
 }
 
-videojs.registerPlugin('watermark', Watermark);
-```
+videojs.registerPlugin('watermark', WatermarkPlugin);
 
-### 分析插件
-```typescript
-// src/plugins/analytics.ts
-import videojs from 'video.js';
+// 使用
+player.watermark({ text: '© 2024 My Company' });
 
-const Plugin = videojs.getPlugin('plugin');
-
-interface AnalyticsOptions {
-  trackingId: string;
-  events?: string[];
-}
-
-class Analytics extends Plugin {
-  private trackingId: string;
-  private events: string[];
-  private playedSeconds: number = 0;
-  private lastTimeUpdate: number = 0;
-
-  constructor(player: videojs.Player, options: AnalyticsOptions) {
+// plugins/hotkeys.ts
+class HotkeysPlugin extends Plugin {
+  constructor(player: videojs.Player, options: any) {
     super(player, options);
 
-    this.trackingId = options.trackingId;
-    this.events = options.events || ['play', 'pause', 'ended', 'seeked', 'error'];
-
-    this.setupEventTracking();
-  }
-
-  private setupEventTracking() {
-    // 播放
-    this.player.on('play', () => {
-      this.trackEvent('play', {
-        currentTime: this.player.currentTime(),
-      });
-    });
-
-    // 暂停
-    this.player.on('pause', () => {
-      this.trackEvent('pause', {
-        currentTime: this.player.currentTime(),
-        playedSeconds: this.playedSeconds,
-      });
-    });
-
-    // 结束
-    this.player.on('ended', () => {
-      this.trackEvent('ended', {
-        playedSeconds: this.playedSeconds,
-        duration: this.player.duration(),
-      });
-    });
-
-    // 跳转
-    this.player.on('seeked', () => {
-      this.trackEvent('seeked', {
-        currentTime: this.player.currentTime(),
-      });
-    });
-
-    // 时间跟踪
-    this.player.on('timeupdate', () => {
-      const currentTime = this.player.currentTime() || 0;
-      const deltaTime = currentTime - this.lastTimeUpdate;
-      
-      if (deltaTime > 0 && deltaTime < 2) {
-        this.playedSeconds += deltaTime;
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          if (player.paused()) {
+            player.play();
+          } else {
+            player.pause();
+          }
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          player.currentTime(player.currentTime() - 10);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          player.currentTime(player.currentTime() + 10);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          player.volume(Math.min(1, player.volume() + 0.1));
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          player.volume(Math.max(0, player.volume() - 0.1));
+          break;
+        case 'm':
+          player.muted(!player.muted());
+          break;
+        case 'f':
+          if (player.isFullscreen()) {
+            player.exitFullscreen();
+          } else {
+            player.requestFullscreen();
+          }
+          break;
       }
-      
-      this.lastTimeUpdate = currentTime;
-    });
-
-    // 错误
-    this.player.on('error', () => {
-      const error = this.player.error();
-      this.trackEvent('error', {
-        code: error?.code,
-        message: error?.message,
-      });
     });
   }
-
-  private trackEvent(action: string, data: any = {}) {
-    // 发送到分析服务
-    fetch('https://analytics.example.com/track', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        trackingId: this.trackingId,
-        event: action,
-        timestamp: Date.now(),
-        data: {
-          videoSrc: this.player.src(),
-          duration: this.player.duration(),
-          ...data,
-        },
-      }),
-    }).catch((error) => {
-      console.error('Analytics tracking failed:', error);
-    });
-  }
-
-  dispose() {
-    this.player.off('play');
-    this.player.off('pause');
-    this.player.off('ended');
-    this.player.off('seeked');
-    this.player.off('timeupdate');
-    this.player.off('error');
-    super.dispose();
-  }
 }
 
-videojs.registerPlugin('analytics', Analytics);
-```
-
-### 质量选择器插件
-```typescript
-// src/plugins/quality-selector.ts
-import videojs from 'video.js';
-import QualityLevels from 'videojs-contrib-quality-levels';
-
-const Plugin = videojs.getPlugin('plugin');
-
-interface QualityLevel {
-  id: string;
-  label: string;
-  width: number;
-  height: number;
-  bitrate: number;
-}
-
-class QualitySelector extends Plugin {
-  private qualityLevels: QualityLevels | null = null;
-  private menuButton: any = null;
-
-  constructor(player: videojs.Player) {
-    super(player);
-
-    this.player.ready(() => {
-      this.setupQualityLevels();
-      this.createMenuButton();
-    });
-  }
-
-  private setupQualityLevels() {
-    this.qualityLevels = this.player.qualityLevels();
-
-    this.qualityLevels.on('addqualitylevel', (event: any) => {
-      console.log('Quality level added:', event.qualityLevel);
-    });
-
-    this.qualityLevels.on('change', (event: any) => {
-      console.log('Quality level changed:', event);
-    });
-  }
-
-  private createMenuButton() {
-    const MenuButton = videojs.getComponent('MenuButton');
-    const MenuItem = videojs.getComponent('MenuItem');
-
-    class QualityMenuButton extends MenuButton {
-      constructor(player: any, options: any) {
-        super(player, options);
-        this.addClass('vjs-quality-button');
-        this.controlText('Quality');
-      }
-
-      createItems() {
-        const items: any[] = [];
-        const qualityLevels = this.player().qualityLevels();
-
-        // Auto
-        items.push(
-          new MenuItem(this.player(), {
-            label: 'Auto',
-            selectable: true,
-            selected: true,
-          })
-        );
-
-        // 添加所有质量级别
-        for (let i = 0; i < qualityLevels.length; i++) {
-          const level = qualityLevels[i];
-          items.push(
-            new MenuItem(this.player(), {
-              label: this.getLabel(level),
-              selectable: true,
-              selected: false,
-            })
-          );
-        }
-
-        return items;
-      }
-
-      private getLabel(level: any): string {
-        if (level.height >= 2160) return '4K';
-        if (level.height >= 1080) return '1080p';
-        if (level.height >= 720) return '720p';
-        if (level.height >= 480) return '480p';
-        return '360p';
-      }
-    }
-
-    videojs.registerComponent('QualityMenuButton', QualityMenuButton);
-    this.menuButton = this.player.controlBar.addChild(
-      'QualityMenuButton',
-      {},
-      this.player.controlBar.children().length - 1
-    );
-  }
-
-  dispose() {
-    if (this.menuButton) {
-      this.menuButton.dispose();
-    }
-    super.dispose();
-  }
-}
-
-videojs.registerPlugin('qualitySelector', QualitySelector);
-```
-
-### TypeScript 类型
-```typescript
-// src/types/index.ts
-import videojs from 'video.js';
-
-declare module 'video.js' {
-  interface Player {
-    qualityLevels(): QualityLevels;
-    watermark(options?: WatermarkOptions): void;
-    analytics(options: AnalyticsOptions): void;
-    qualitySelector(): void;
-  }
-}
-
-export interface VideoPlayerOptions extends videojs.PlayerOptions {
-  sources?: VideoSource[];
-  poster?: string;
-  tracks?: TextTrack[];
-}
-
-export interface VideoSource {
-  src: string;
-  type: string;
-  label?: string;
-  res?: number;
-}
-
-export interface TextTrack {
-  kind: 'subtitles' | 'captions' | 'chapters' | 'descriptions' | 'metadata';
-  src: string;
-  srclang: string;
-  label: string;
-  default?: boolean;
-}
+videojs.registerPlugin('hotkeys', HotkeysPlugin);
 ```
 
 ## 最佳实践
 
-### 1. 响应式设计
-```typescript
-// 使用 fluid 或 responsive 选项
-const options: VideoPlayerOptions = {
-  fluid: true, // 或
-  responsive: true,
-  aspectRatio: '16:9',
-};
+### 1. 自定义主题
+
+```css
+/* themes/netflix.css */
+.video-js.vjs-theme-netflix {
+  --vjs-theme-netflix-primary: #e50914;
+  --vjs-theme-netflix-secondary: #141414;
+}
+
+.video-js.vjs-theme-netflix .vjs-big-play-button {
+  background-color: var(--vjs-theme-netflix-primary);
+  border: none;
+  border-radius: 4px;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  font-size: 40px;
+}
+
+.video-js.vjs-theme-netflix .vjs-control-bar {
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  height: 60px;
+}
+
+.video-js.vjs-theme-netflix .vjs-play-progress {
+  background-color: var(--vjs-theme-netflix-primary);
+}
+
+.video-js.vjs-theme-netflix .vjs-volume-level {
+  background-color: var(--vjs-theme-netflix-primary);
+}
 ```
 
-### 2. 多源回退
+### 2. 分析集成
+
 ```typescript
-const sources = [
-  { src: 'video.mp4', type: 'video/mp4' },
-  { src: 'video.webm', type: 'video/webm' },
-  { src: 'video.ogv', type: 'video/ogg' },
-];
+// utils/analytics.ts
+import videojs from 'video.js';
+
+export function setupAnalytics(player: videojs.Player) {
+  let playCount = 0;
+  let totalWatchTime = 0;
+  let lastTimeUpdate = 0;
+
+  player.on('play', () => {
+    playCount++;
+    lastTimeUpdate = Date.now();
+    sendAnalytics('play', {
+      playCount,
+      currentTime: player.currentTime(),
+    });
+  });
+
+  player.on('pause', () => {
+    const watchTime = (Date.now() - lastTimeUpdate) / 1000;
+    totalWatchTime += watchTime;
+    sendAnalytics('pause', {
+      totalWatchTime,
+      currentTime: player.currentTime(),
+    });
+  });
+
+  player.on('ended', () => {
+    sendAnalytics('completed', {
+      playCount,
+      totalWatchTime,
+      duration: player.duration(),
+    });
+  });
+
+  player.on('qualitychange', () => {
+    sendAnalytics('quality_change', {
+      quality: player.qualityLevels()[player.qualityLevels().selectedIndex],
+    });
+  });
+
+  player.on('error', () => {
+    const error = player.error();
+    sendAnalytics('error', {
+      code: error?.code,
+      message: error?.message,
+    });
+  });
+}
+
+async function sendAnalytics(event: string, data: any) {
+  try {
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, data, timestamp: Date.now() }),
+    });
+  } catch (error) {
+    console.error('Analytics error:', error);
+  }
+}
 ```
 
-### 3. 无障碍性
+### 3. 本地存储
+
 ```typescript
-const options: VideoPlayerOptions = {
-  controls: true,
-  controlBar: {
-    playToggle: true,
-    volumePanel: true,
-    currentTimeDisplay: true,
-    durationDisplay: true,
-    progressControl: true,
-    liveDisplay: true,
-    seekToLive: true,
-    remainingTimeDisplay: true,
-    customControlSpacer: true,
-    playbackRateMenuButton: true,
-    chaptersButton: true,
-    descriptionsButton: true,
-    subsCapsButton: true,
-    audioTrackButton: true,
-    pictureInPictureToggle: true,
-    fullscreenToggle: true,
-  },
-  tracks: [
-    {
-      kind: 'captions',
-      src: 'captions.vtt',
-      srclang: 'en',
-      label: 'English',
-      default: true,
-    },
-  ],
+// utils/storage.ts
+import videojs from 'video.js';
+
+export function setupStorage(player: videojs.Player, videoId: string) {
+  const storageKey = `videojs-${videoId}`;
+
+  // 恢复播放进度
+  const savedTime = localStorage.getItem(`${storageKey}-time`);
+  if (savedTime) {
+    player.currentTime(parseFloat(savedTime));
+  }
+
+  // 恢复音量
+  const savedVolume = localStorage.getItem(`${storageKey}-volume`);
+  if (savedVolume) {
+    player.volume(parseFloat(savedVolume));
+  }
+
+  // 保存播放进度
+  player.on('timeupdate', () => {
+    const currentTime = player.currentTime();
+    localStorage.setItem(`${storageKey}-time`, currentTime.toString());
+  });
+
+  // 保存音量
+  player.on('volumechange', () => {
+    const volume = player.volume();
+    localStorage.setItem(`${storageKey}-volume`, volume.toString());
+  });
+
+  // 清除完成的视频进度
+  player.on('ended', () => {
+    localStorage.removeItem(`${storageKey}-time`);
+  });
+}
+```
+
+### 4. 响应式设计
+
+```typescript
+// components/ResponsivePlayer.tsx
+import React, { useEffect, useRef, useState } from 'react';
+import videojs from 'video.js';
+
+export const ResponsivePlayer: React.FC<{ src: string }> = ({ src }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<videojs.Player | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    playerRef.current = videojs(videoRef.current, {
+      sources: [{ src, type: 'video/mp4' }],
+      fluid: true,
+      responsive: true,
+      controls: !isMobile,
+      controlBar: isMobile
+        ? false
+        : {
+            children: [
+              'playToggle',
+              'volumePanel',
+              'currentTimeDisplay',
+              'timeDivider',
+              'durationDisplay',
+              'progressControl',
+              'fullscreenToggle',
+            ],
+          },
+    });
+
+    return () => {
+      if (playerRef.current && !playerRef.current.isDisposed()) {
+        playerRef.current.dispose();
+      }
+    };
+  }, [src, isMobile]);
+
+  return (
+    <div data-vjs-player>
+      <video
+        ref={videoRef}
+        className={`video-js ${isMobile ? 'vjs-mobile' : 'vjs-desktop'}`}
+      />
+    </div>
+  );
 };
 ```
 
 ## 常用命令
 
-### 安装
 ```bash
-# 安装 Video.js
+# 安装
 npm install video.js
 
-# 安装 TypeScript 类型
-npm install -D @types/video.js
+# TypeScript 支持
+npm install @types/video.js -D
 
-# 安装 HLS 支持
-npm install videojs-contrib-quality-levels videojs-hls-quality-selector
+# HLS 支持
+npm install videojs-contrib-quality-menu
 
-# 安装 DASH 支持
-npm install videojs-contrib-dash
+# DASH 支持
+npm install dashjs
 
-# 安装 React 集成
+# 广告支持
+npm install videojs-contrib-ads videojs-ima
+
+# 主题
 npm install @videojs/themes
-```
-
-### 开发
-```bash
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-
-# 运行测试
-npm run test
 ```
 
 ## 部署配置
 
-### package.json
-```json
-{
-  "name": "videojs-project",
-  "version": "1.0.0",
-  "dependencies": {
-    "react": "^18.2.0",
-    "video.js": "^8.10.0",
-    "videojs-contrib-quality-levels": "^4.0.0",
-    "videojs-hls-quality-selector": "^2.0.0",
-    "videojs-contrib-dash": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.0",
-    "@types/video.js": "^7.3.0",
-    "typescript": "^5.3.0",
-    "vite": "^5.0.0"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+### CDN 引入
+
+```html
+<link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+<!-- HLS 支持 -->
+<script src="https://cdn.jsdelivr.net/npm/videojs-hls-support@1.0.0/dist/videojs-hls-support.min.js"></script>
+
+<script>
+  const player = videojs('my-video', {
+    controls: true,
+    autoplay: false,
+    preload: 'auto',
+    sources: [{
+      src: 'video.mp4',
+      type: 'video/mp4'
+    }]
+  });
+</script>
+```
+
+### Next.js 配置
+
+```typescript
+// components/DynamicVideoPlayer.tsx
+import React from 'react';
+import dynamic from 'next/dynamic';
+
+const VideoPlayer = dynamic(() => import('./VideoPlayer'), { ssr: false });
+
+export function DynamicVideoPlayer(props: any) {
+  return <VideoPlayer {...props} />;
+}
+```
+
+### 服务端渲染
+
+```typescript
+// components/SSRPlayer.tsx
+import React, { useEffect, useRef } from 'react';
+
+export const SSRPlayer: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !containerRef.current) return;
+
+    // 动态导入 video.js
+    import('video.js').then((videojs) => {
+      const video = document.createElement('video');
+      video.className = 'video-js vjs-theme-city';
+      video.setAttribute('playsInline', 'true');
+      
+      containerRef.current?.appendChild(video);
+
+      const player = videojs.default(video, {
+        sources: [{ src: '/video.mp4', type: 'video/mp4' }],
+      });
+
+      return () => {
+        player.dispose();
+      };
+    });
+  }, [mounted]);
+
+  return <div ref={containerRef} />;
+};
+```
+
+### Nginx 配置
+
+```nginx
+# nginx.conf
+server {
+  location /videos/ {
+    # 支持 Range 请求
+    add_header Accept-Ranges bytes;
+    
+    # 启用缓存
+    add_header Cache-Control "public, max-age=31536000";
+    
+    # HLS 支持
+    types {
+      application/vnd.apple.mpegurl m3u8;
+      video/mp2t ts;
+    }
+  }
+
+  location /hls/ {
+    # HLS 流媒体配置
+    types {
+      application/vnd.apple.mpegurl m3u8;
+    }
+    
+    add_header Cache-Control no-cache;
+    add_header Access-Control-Allow-Origin *;
   }
 }
 ```
 
-### tsconfig.json
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}
-```
+## 扩展资源
 
-### Vite 配置
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'video.js': ['video.js'],
-        },
-      },
-    },
-  },
-});
-```
-
-### Nginx 配置（视频流）
-```nginx
-server {
-    listen 80;
-    server_name example.com;
-
-    location /videos/ {
-        alias /var/www/videos/;
-        
-        # 支持范围请求
-        add_header Accept-Ranges bytes;
-        
-        # 缓存设置
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        
-        # CORS
-        add_header Access-Control-Allow-Origin *;
-        
-        # HLS/DASH 支持
-        types {
-            application/vnd.apple.mpegurl m3u8;
-            application/dash+xml mpd;
-        }
-    }
-}
-```
-
-### 环境变量
-```bash
-# .env
-VITE_API_URL=https://api.example.com
-VITE_VIDEO_CDN=https://cdn.example.com/videos
-```
+- [Video.js 官方文档](https://videojs.com/)
+- [GitHub 仓库](https://github.com/videojs/video.js)
+- [插件列表](https://videojs.com/plugins/)
+- [主题集合](https://github.com/videojs/themes)
+- [HLS 指南](https://docs.videojs.com/tutorial-videojs.html#hls)
