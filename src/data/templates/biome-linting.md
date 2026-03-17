@@ -1,34 +1,31 @@
-# Biome 代码检查与格式化模板
+# Biome Linting & Formatting Template
 
 ## 技术栈
 
-- **核心工具**: Biome 1.x（原 Rome）
-- **语言支持**: JavaScript, TypeScript, JSX, TSX, JSON
+- **核心**: Biome ^1.x (Rome 继任者)
 - **功能**: Linting + Formatting + Import Sorting
-- **编辑器集成**: VS Code, JetBrains IDEs
-- **CI/CD**: GitHub Actions, GitLab CI
-- **配置格式**: JSON (biome.json)
+- **语言**: JavaScript / TypeScript / JSX / TSX / JSON
+- **集成**: VS Code / WebStorm / CI/CD
 
 ## 项目结构
 
 ```
 biome-project/
-├── src/                       # 源代码
-│   ├── components/           # 组件
-│   ├── hooks/                # Hooks
-│   ├── utils/                # 工具函数
-│   └── types/                # 类型定义
-├── tests/                    # 测试文件
-├── biome.json                # Biome 配置文件
+├── src/
+│   ├── components/
+│   ├── hooks/
+│   ├── utils/
+│   └── index.ts
+├── biome.json              # Biome 配置
 ├── package.json
 ├── tsconfig.json
 └── .vscode/
-    └── settings.json         # VS Code 配置
+    └── settings.json       # 编辑器集成
 ```
 
 ## 代码模式
 
-### Biome 配置文件
+### 基础配置
 
 ```json
 // biome.json
@@ -47,8 +44,7 @@ biome-project/
         "noUselessCatch": "error",
         "noUselessThisAlias": "error",
         "noUselessTypeConstraint": "error",
-        "noWith": "error",
-        "useFlatMap": "error"
+        "noWith": "error"
       },
       "correctness": {
         "noConstAssign": "error",
@@ -70,7 +66,7 @@ biome-project/
         "noUnsafeFinally": "error",
         "noUnsafeOptionalChaining": "error",
         "noUnusedLabels": "error",
-        "noUnusedVariables": "error",
+        "noUnusedVariables": "warn",
         "useIsNan": "error",
         "useValidForDirection": "error",
         "useYield": "error"
@@ -103,62 +99,23 @@ biome-project/
       },
       "style": {
         "noArguments": "error",
-        "noInferrableTypes": "warn",
-        "noNamespace": "error",
-        "noNegationElse": "warn",
-        "noNonNullAssertion": "warn",
-        "noParameterAssign": "warn",
-        "noUnusedTemplateLiteral": "warn",
         "noVar": "error",
         "useConst": "error",
-        "useEnumInitializers": "warn",
-        "useExponentiationOperator": "error",
-        "useForOf": "warn",
-        "useFragmentSyntax": "warn",
-        "useLiteralEnumMembers": "warn",
-        "useNumberNamespace": "error",
-        "useNumericLiterals": "warn",
-        "useShorthandFunctionType": "warn",
-        "useSingleCaseStatement": "warn",
-        "useSingleVarDeclarator": "error",
         "useTemplate": "warn"
       },
       "performance": {
-        "noAccumulatingSpread": "warn",
         "noDelete": "warn"
       },
       "security": {
         "noDangerouslySetInnerHtml": "warn",
-        "noDangerouslySetInnerHtmlWithChildren": "error"
+        "noGlobalEval": "error"
       },
       "a11y": {
-        "noAccessKey": "warn",
-        "noAriaHiddenOnFocusable": "error",
-        "noAriaUnsupportedElements": "error",
-        "noAutofocus": "warn",
-        "noBlankTarget": "error",
-        "noDistractingElements": "error",
-        "noHeaderScope": "warn",
-        "noNoninteractiveElementToInteractiveRole": "error",
-        "noNoninteractiveTabindex": "warn",
-        "noPositiveTabindex": "warn",
-        "noRedundantAlt": "warn",
-        "noRedundantRoles": "warn",
-        "noSvgWithoutTitle": "warn",
         "useAltText": "error",
         "useAnchorContent": "error",
-        "useAriaActivedescendantWithTabindex": "warn",
-        "useAriaPropsForRole": "error",
         "useButtonType": "error",
-        "useHtmlLang": "error",
-        "useIframeTitle": "error",
-        "useKeyWithClickEvents": "error",
-        "useKeyWithMouseEvents": "warn",
-        "useMediaCaption": "warn",
-        "useValidAnchor": "error",
-        "useValidAriaProps": "error",
-        "useValidAriaRole": "error",
-        "useValidAriaValues": "error"
+        "useKeyWithClickEvents": "warn",
+        "useKeyWithMouseEvents": "warn"
       }
     }
   },
@@ -168,9 +125,7 @@ biome-project/
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "lineEnding": "lf",
-    "attributePosition": "auto",
-    "ignore": ["node_modules", "dist", "build", ".next", "coverage"]
+    "lineEnding": "lf"
   },
   "javascript": {
     "formatter": {
@@ -186,7 +141,10 @@ biome-project/
   },
   "json": {
     "formatter": {
-      "trailingCommas": "none"
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 100
     }
   },
   "files": {
@@ -196,210 +154,88 @@ biome-project/
       "build",
       ".next",
       "coverage",
-      "*.min.js",
-      "*.generated.*"
-    ],
-    "ignoreUnknown": true
-  },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  }
-}
-```
-
-### Monorepo 配置
-
-```json
-// biome.json (monorepo 根目录)
-{
-  "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true
-    }
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "trailingComma": "es5",
-      "semicolons": "always"
-    }
-  },
-  "overrides": [
-    {
-      "include": ["packages/ui/**", "packages/components/**"],
-      "linter": {
-        "rules": {
-          "style": {
-            "useConst": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["apps/web/**"],
-      "javascript": {
-        "formatter": {
-          "quoteStyle": "double"
-        }
-      }
-    },
-    {
-      "include": ["**/*.test.ts", "**/*.spec.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
-    }
-  ]
-}
-```
-
-### Next.js 项目配置
-
-```json
-// biome.json (Next.js)
-{
-  "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "correctness": {
-        "noUnusedVariables": "error"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn"
-      }
-    }
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "trailingComma": "es5",
-      "semicolons": "always"
-    },
-    "jsxRuntime": "transparent"
-  },
-  "files": {
-    "ignore": [
-      ".next",
-      "node_modules",
-      "out",
-      "public",
-      "coverage"
+      "*.min.js"
     ]
   }
 }
 ```
 
-### React 项目配置
+### React/JSX 配置
 
 ```json
-// biome.json (React)
+// biome.json (React 项目)
 {
   "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
   "linter": {
-    "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": {
-        "noAutofocus": "off",
-        "useButtonType": "error"
-      },
       "correctness": {
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn"
       },
-      "suspicious": {
-        "noArrayIndexKey": "warn"
+      "a11y": {
+        "useAltText": "error",
+        "useAnchorContent": "error",
+        "useButtonType": "error",
+        "useHtmlLang": "error",
+        "useIframeTitle": "error",
+        "useMediaCaption": "warn",
+        "noBlankTarget": "error",
+        "noSvgWithoutTitle": "warn"
       }
     }
   },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
   "javascript": {
+    "jsxRuntime": "react",
     "formatter": {
-      "quoteStyle": "single",
-      "trailingComma": "es5",
-      "semicolons": "always",
-      "arrowParentheses": "always"
-    },
-    "jsxRuntime": "reactClassic"
+      "jsxQuoteStyle": "double",
+      "quoteStyle": "single"
+    }
   }
 }
 ```
 
-### TypeScript 严格配置
+### Next.js 配置
 
 ```json
-// biome.json (TypeScript 严格模式)
+// biome.json (Next.js 项目)
 {
   "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
   "linter": {
-    "enabled": true,
     "rules": {
       "recommended": true,
-      "complexity": {
-        "noExtraBooleanCast": "error",
-        "noUselessLoneBlockStatements": "error",
-        "useSimplifiedLogicExpression": "warn"
-      },
       "correctness": {
-        "noUnusedVariables": "error",
-        "useHookAtTopLevel": "error"
-      },
-      "suspicious": {
-        "noExplicitAny": "error",
-        "noMisleadingInstantiator": "error"
-      },
-      "style": {
-        "noInferrableTypes": "error",
-        "useConst": "error",
-        "useEnumInitializers": "error",
-        "useNodejsImportProtocol": "error",
-        "useShorthandFunctionType": "error"
+        "noUnusedImports": "error"
       }
     }
   },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
+  "javascript": {
+    "jsxRuntime": "transparent"
+  },
+  "files": {
+    "ignore": [
+      ".next",
+      "out",
+      "next-env.d.ts"
+    ]
+  }
+}
+```
+
+### npm scripts 配置
+
+```json
+// package.json
+{
+  "scripts": {
+    "lint": "biome check .",
+    "lint:fix": "biome check . --apply",
+    "format": "biome format . --write",
+    "check": "biome check . --apply && biome format . --write",
+    "ci": "biome ci ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.0"
   }
 }
 ```
@@ -418,10 +254,10 @@ biome-project/
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[javascriptreact]": {
+  "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "[typescript]": {
+  "[javascriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
@@ -434,150 +270,176 @@ biome-project/
     "editor.defaultFormatter": "biomejs.biome"
   }
 }
-
-// .vscode/extensions.json
-{
-  "recommendations": ["biomejs.biome"]
-}
 ```
 
-### package.json 脚本
+### 从 ESLint/Prettier 迁移
+
+```bash
+# 安装 Biome
+npm install -D @biomejs/biome
+
+# 从 ESLint + Prettier 配置迁移
+npx @biomejs/biome migrate --write
+
+# 卸载旧依赖
+npm uninstall eslint prettier eslint-config-* prettier-plugin-*
+```
 
 ```json
+// 迁移后的 biome.json
 {
-  "scripts": {
-    "lint": "biome check .",
-    "lint:fix": "biome check --apply .",
-    "lint:unsafe": "biome check --apply-unsafe .",
-    "format": "biome format .",
-    "format:write": "biome format --write .",
-    "check": "biome check --apply --linter-enabled=true . && biome format --write .",
-    "ci": "biome ci ."
+  "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
+  "organizeImports": {
+    "enabled": true
   },
-  "devDependencies": {
-    "@biomejs/biome": "^1.5.0"
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "lineWidth": 80
   }
 }
 ```
 
 ## 最佳实践
 
-### 1. 从 ESLint/Prettier 迁移
-
-```bash
-# 安装 Biome
-npm install --save-dev @biomejs/biome
-
-# 自动迁移 ESLint 配置
-npx @biomejs/biome migrate --write
-
-# 删除旧依赖
-npm uninstall eslint prettier eslint-config-* prettier-plugin-*
-
-# 更新 package.json 脚本
-# 将 npm run lint 改为 biome check
-# 将 npm run format 改为 biome format
-```
-
-### 2. Git Hooks 集成
-
-```bash
-# 使用 simple-git-hooks
-npm install --save-dev simple-git-hooks
-
-# package.json
-{
-  "simple-git-hooks": {
-    "pre-commit": "npx biome check --apply --staged"
-  }
-}
-```
-
-```bash
-# 使用 Husky
-npm install --save-dev husky
-
-# .husky/pre-commit
-npx biome check --apply --staged
-```
-
-### 3. 忽略文件配置
+### 1. 渐进式采用
 
 ```json
-// biome.json
-{
-  "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      ".next",
-      "coverage",
-      "*.min.js",
-      "**/*.generated.*",
-      "**/vendor/**"
-    ],
-    "ignoreUnknown": true
-  }
-}
-```
-
-```gitignore
-# .gitignore 中也可以忽略 Biome 相关
-.biome
-biome.log
-```
-
-### 4. 增量检查
-
-```bash
-# 只检查修改的文件
-biome check --changed=origin/main
-
-# 只检查暂存文件
-biome check --staged
-
-# 使用 Git diff
-biome check $(git diff --name-only --diff-filter=d origin/main)
-```
-
-### 5. 错误级别配置
-
-```json
-// biome.json
+// biome.json (渐进式配置)
 {
   "linter": {
+    "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "off"      // 完全关闭
-      },
+      // 先警告后错误
       "correctness": {
-        "noUnusedVariables": "warn" // 警告级别
+        "noUnusedVariables": "warn"
       },
       "style": {
-        "useConst": "error"         // 错误级别
+        "useConst": "warn",
+        "noVar": "warn"
+      }
+    }
+  },
+  "files": {
+    "ignore": [
+      "legacy/**",
+      "*.test.ts"
+    ]
+  }
+}
+```
+
+### 2. Monorepo 配置
+
+```json
+// 根目录 biome.json
+{
+  "$schema": "https://biomejs.dev/schemas/1.5.0/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  }
+}
+```
+
+```json
+// packages/app/biome.json (继承并覆盖)
+{
+  "extends": "../../biome.json",
+  "linter": {
+    "rules": {
+      "a11y": {
+        "useAltText": "error"
       }
     }
   }
 }
 ```
 
-### 6. 针对特定文件覆盖规则
+### 3. CI/CD 集成
+
+```yaml
+# .github/workflows/lint.yml
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  biome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - run: npm ci
+      
+      - name: Run Biome
+        run: npm run ci
+```
+
+```yaml
+# GitLab CI
+lint:
+  image: node:20
+  script:
+    - npm ci
+    - npm run ci
+  only:
+    - merge_requests
+```
+
+### 4. Pre-commit 钩子
+
+```bash
+# .husky/pre-commit
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx @biomejs/biome check --staged --apply
+```
+
+```json
+// package.json
+{
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": [
+      "biome check --apply"
+    ]
+  }
+}
+```
+
+### 5. 自定义规则覆盖
 
 ```json
 // biome.json
 {
   "overrides": [
     {
-      "include": ["**/*.test.ts", "**/*.spec.ts"],
+      "include": ["*.test.ts", "*.spec.ts"],
       "linter": {
         "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          },
           "suspicious": {
             "noExplicitAny": "off"
-          },
-          "complexity": {
-            "noForEach": "off"
           }
         }
       }
@@ -591,184 +453,91 @@ biome check $(git diff --name-only --diff-filter=d origin/main)
           }
         }
       }
+    },
+    {
+      "include": ["*.config.js", "*.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": "off"
+          }
+        }
+      }
     }
   ]
+}
+```
+
+### 6. 团队共享配置
+
+```javascript
+// biome.config.js (可编程配置)
+module.exports = {
+  linter: {
+    rules: {
+      recommended: true,
+      // 根据环境调整
+      ...(process.env.NODE_ENV === 'production' && {
+        correctness: {
+          noUnusedVariables: 'error'
+        }
+      })
+    }
+  }
+};
+```
+
+```bash
+# 发布共享配置包
+# @your-org/biome-config
+npm init -y
+npm publish
+```
+
+```json
+// 使用共享配置
+{
+  "extends": "@your-org/biome-config"
 }
 ```
 
 ## 常用命令
 
 ```bash
-# 基础命令
+# 安装
+npm install -D @biomejs/biome
 
-# 检查代码（lint）
-biome check .
-biome check src/
-biome check src/index.ts
+# 初始化
+npx @biomejs/biome init
 
-# 检查并自动修复
-biome check --apply .
-biome check --apply-unsafe .
+# 检查
+npx @biomejs/biome check .
 
-# 格式化代码
-biome format .
-biome format --write .
-biome format --write src/
+# 自动修复
+npx @biomejs/biome check --apply .
 
-# 只检查不格式化
-biome check --linter-enabled=true .
-biome check --formatter-enabled=false .
+# 格式化
+npx @biomejs/biome format --write .
 
-# 组织导入
-biome check --apply . --linter-enabled=false --formatter-enabled=false
+# 仅检查暂存文件
+npx @biomejs/biome check --staged .
 
 # CI 模式
-biome ci .
-biome ci --error-on-warnings .
+npx @biomejs/biome ci .
 
-# 增量检查
-biome check --changed=origin/main
-biome check --staged
+# 从 ESLint/Prettier 迁移
+npx @biomejs/biome migrate --write
 
-# 显示详细信息
-biome check --verbose .
-biome check --json .  # JSON 输出
+# 查看 info
+npx @biomejs/biome rage
 
-# 检查特定规则
-biome check --only=suspicious/noExplicitAny .
-biome check --only=style/useConst .
-
-# 跳过特定规则
-biome check --skip=suspicious/noExplicitAny .
-
-# 初始化配置
-biome init
-
-# 从 ESLint 迁移
-biome migrate --write
-biome migrate --from-eslint-prettier
-
-# 查看 CPU/内存使用
-biome check --show-parser-errors .
-
-# 帮助
-biome --help
-biome check --help
-biome format --help
+# 搜索规则
+npx @biomejs/biome search noUnused
 ```
 
 ## 部署配置
 
-### GitHub Actions 集成
-
-```yaml
-# .github/workflows/lint.yml
-name: Lint
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run Biome CI
-        run: npx biome ci .
-      
-      - name: Run Biome with JSON output
-        if: failure()
-        run: npx biome check --json . > biome-report.json
-      
-      - name: Upload report
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: biome-report
-          path: biome-report.json
-```
-
-### GitLab CI 集成
-
-```yaml
-# .gitlab-ci.yml
-stages:
-  - lint
-
-biome:
-  stage: lint
-  image: node:20-alpine
-  cache:
-    paths:
-      - node_modules/
-  script:
-    - npm ci
-    - npx biome ci .
-  only:
-    - merge_requests
-    - main
-```
-
-### CircleCI 集成
-
-```yaml
-# .circleci/config.yml
-version: 2.1
-
-jobs:
-  lint:
-    docker:
-      - image: cimg/node:20.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
-      - run: npx biome ci .
-
-workflows:
-  version: 2
-  build-and-lint:
-    jobs:
-      - lint
-```
-
-### Pre-commit Hook
-
-```yaml
-# .pre-commit-config.yaml
-repos:
-  - repo: local
-    hooks:
-      - id: biome-check
-        name: Biome check
-        entry: npx biome check --apply --staged
-        language: system
-        types: [file]
-        files: \.(js|jsx|ts|tsx|json)$
-        pass_filenames: false
-```
-
-### Docker 集成
+### Docker
 
 ```dockerfile
 # Dockerfile
@@ -776,153 +545,57 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# 安装 Biome
+RUN npm install -g @biomejs/biome
+
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
 
-# 在构建前检查代码
-RUN npx biome ci .
+# 运行检查
+RUN biome ci .
 
+# 构建
 RUN npm run build
 
 # 生产镜像
 FROM node:20-alpine
-
-WORKDIR /app
-
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-
 CMD ["node", "dist/index.js"]
 ```
 
-### Nx 集成
+### Package.json Scripts
 
 ```json
-// nx.json
 {
-  "targetDefaults": {
-    "lint": {
-      "executor": "@biomejs/biome:check",
-      "options": {
-        "write": true
-      }
-    }
-  }
-}
-
-// project.json
-{
-  "targets": {
-    "lint": {
-      "executor": "@biomejs/biome:check",
-      "options": {
-        "write": true,
-        "configPath": "biome.json"
-      }
-    },
-    "format": {
-      "executor": "@biomejs/biome:format",
-      "options": {
-        "write": true
-      }
-    }
+  "scripts": {
+    "dev": "next dev",
+    "build": "biome check . && next build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
+    "ci": "biome ci .",
+    "prepare": "husky"
   }
 }
 ```
 
-## 性能优化
-
-### 1. 使用 Git Ignore 集成
+### 编辑器配置
 
 ```json
-// biome.json
+// .vscode/extensions.json
 {
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  }
+  "recommendations": [
+    "biomejs.biome"
+  ]
 }
 ```
 
-### 2. 并行处理
-
-```bash
-# 默认已并行，可设置线程数
-biome check --threads=4 .
+```xml
+<!-- .idea/workspace.xml (WebStorm/IntelliJ) -->
+<component name="BiomeSettings">
+  <option name="biomeExecutable" value="node_modules/.bin/biome" />
+  <option name="runBiomeOnSave" value="true" />
+</component>
 ```
-
-### 3. 增量检查
-
-```bash
-# CI 中只检查变更
-biome check --changed=origin/main --no-errors-on-unmatched
-```
-
-### 4. 缓存配置
-
-```bash
-# Biome 默认使用缓存，无需额外配置
-# 清除缓存
-biome check --clear-cache .
-```
-
-## 与其他工具对比
-
-| 特性 | Biome | ESLint + Prettier |
-|------|-------|-------------------|
-| 速度 | ⚡ 超快 (Rust) | 🐢 较慢 (JS) |
-| 安装 | 📦 单个包 | 📦 50+ 包 |
-| 配置 | 📝 单个文件 | 📝 多个文件 |
-| Linting | ✅ | ✅ |
-| Formatting | ✅ | ✅ |
-| Import Sort | ✅ 内置 | ❌ 需插件 |
-| 错误恢复 | ✅ 强大 | ⚠️ 一般 |
-| IDE 集成 | ✅ | ✅ |
-
-## 常见问题解决
-
-### Q: 如何处理与 Prettier 冲突？
-
-```bash
-# 1. 卸载 Prettier
-npm uninstall prettier prettier-plugin-*
-
-# 2. 删除 .prettierrc* 配置文件
-
-# 3. 使用 Biome 格式化
-biome format --write .
-```
-
-### Q: 如何禁用特定规则？
-
-```json
-// biome.json
-{
-  "linter": {
-    "rules": {
-      "suspicious": {
-        "noExplicitAny": "off"
-      }
-    }
-  }
-}
-```
-
-### Q: 如何只格式化不检查？
-
-```bash
-biome format --write .
-# 或
-biome check --linter-enabled=false .
-```
-
-## 参考资源
-
-- [Biome 官方文档](https://biomejs.dev/)
-- [Biome GitHub](https://github.com/biomejs/biome)
-- [从 ESLint 迁移指南](https://biomejs.dev/guides/migrate-eslint-prettier/)
-- [规则列表](https://biomejs.dev/linter/rules/)
-- [VS Code 扩展](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)
