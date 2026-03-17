@@ -25,6 +25,10 @@ import kubernetesDeploymentContent from './kubernetes-deployment.md'
 import githubActionsCiContent from './github-actions-ci.md'
 import electronDesktopContent from './electron-desktop.md'
 import mlPipelineContent from './ml-pipeline.md'
+import redwoodjsFullstackContent from './redwoodjs-fullstack.md'
+import tauriDesktopContent from './tauri-desktop.md'
+import gatsbyStaticContent from './gatsby-static.md'
+import nxMonorepoContent from './nx-monorepo.md'
 
 export const templates: Template[] = [
   {
@@ -780,6 +784,131 @@ export const templates: Template[] = [
     featured: true,
     createdAt: '2026-03-13T00:00:00.000Z',
     updatedAt: '2026-03-13T00:00:00.000Z',
+  },
+  {
+    id: 'redwoodjs-fullstack',
+    name: 'RedwoodJS Fullstack Application',
+    slug: 'redwoodjs-fullstack',
+    description: 'Opinionated fullstack framework with integrated React, GraphQL, and Prisma for rapid development',
+    content: redwoodjsFullstackContent,
+    tags: ['redwoodjs', 'react', 'graphql', 'prisma', 'typescript', 'fullstack'],
+    category: TemplateCategory.FULLSTACK,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'RedwoodJS',
+      frameworkVersion: '7.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      database: 'PostgreSQL (Prisma)',
+      testing: ['Jest', 'Playwright', 'Storybook'],
+    },
+    stats: {
+      views: 38,
+      copies: 18,
+      stars: 10,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'tauri-desktop',
+    name: 'Tauri Desktop Application',
+    slug: 'tauri-desktop',
+    description: 'Lightweight secure desktop app with Rust backend, React frontend, and native performance',
+    content: tauriDesktopContent,
+    tags: ['tauri', 'rust', 'react', 'desktop', 'cross-platform', 'native'],
+    category: TemplateCategory.DESKTOP,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Tauri',
+      frameworkVersion: '2.x',
+      language: 'TypeScript / Rust',
+      languageVersion: '5.x / 1.75+',
+      testing: ['Vitest', 'Tauri WebDriver'],
+    },
+    stats: {
+      views: 45,
+      copies: 22,
+      stars: 12,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'gatsby-static',
+    name: 'Gatsby Static Site',
+    slug: 'gatsby-static',
+    description: 'Performance-focused static site generator with React, GraphQL, and excellent SEO',
+    content: gatsbyStaticContent,
+    tags: ['gatsby', 'react', 'graphql', 'static-site', 'ssg', 'seo'],
+    category: TemplateCategory.FRONTEND,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Gatsby',
+      frameworkVersion: '5.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Jest', 'Cypress', 'Testing Library'],
+    },
+    stats: {
+      views: 42,
+      copies: 20,
+      stars: 11,
+      forks: 2,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: false,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'nx-monorepo',
+    name: 'Nx Monorepo',
+    slug: 'nx-monorepo',
+    description: 'Smart monorepo toolkit with dependency graph, affected commands, and consistent code generation',
+    content: nxMonorepoContent,
+    tags: ['nx', 'monorepo', 'typescript', 'react', 'nodejs', 'build'],
+    category: TemplateCategory.OTHER,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'Nx',
+      frameworkVersion: '19.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Jest', 'Cypress', 'Playwright'],
+    },
+    stats: {
+      views: 48,
+      copies: 24,
+      stars: 14,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
   },
 ]
 
