@@ -37,6 +37,10 @@ import vuetify3Content from './vuetify-3.md'
 import quasarFrameworkContent from './quasar-framework.md'
 import feathersjsContent from './feathersjs.md'
 import edgedbContent from './edgedb.md'
+import nativewindContent from './nativewind.md'
+import reanimated3Content from './reanimated-3.md'
+import mmkvStorageContent from './mmkv-storage.md'
+import skiaGraphicsContent from './skia-graphics.md'
 
 export const templates: Template[] = [
   {
@@ -1039,6 +1043,130 @@ export const templates: Template[] = [
     },
     status: TemplateStatus.PUBLISHED,
     featured: false,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'nativewind',
+    name: 'NativeWind v4 - React Native Tailwind CSS',
+    slug: 'nativewind',
+    description: 'Use Tailwind CSS in React Native with instant feedback, dark mode, and responsive design',
+    content: nativewindContent,
+    tags: ['nativewind', 'tailwind', 'react-native', 'styling', 'css', 'mobile'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'NativeWind',
+      frameworkVersion: '4.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'React Native Testing Library'],
+    },
+    stats: {
+      views: 45,
+      copies: 23,
+      stars: 12,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'reanimated-3',
+    name: 'React Native Reanimated 3',
+    slug: 'reanimated-3',
+    description: 'High-performance animations for React Native with 60 FPS, gestures, and worklets',
+    content: reanimated3Content,
+    tags: ['reanimated', 'animation', 'react-native', 'gesture', 'mobile', 'performance'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'React Native Reanimated',
+      frameworkVersion: '3.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest', 'Detox'],
+    },
+    stats: {
+      views: 52,
+      copies: 26,
+      stars: 14,
+      forks: 4,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'mmkv-storage',
+    name: 'React Native MMKV Storage',
+    slug: 'mmkv-storage',
+    description: 'Ultra-fast key-value storage for React Native, 30x faster than AsyncStorage',
+    content: mmkvStorageContent,
+    tags: ['mmkv', 'storage', 'react-native', 'asyncstorage', 'mobile', 'performance'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.INTERMEDIATE,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'React Native MMKV',
+      frameworkVersion: '3.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 48,
+      copies: 24,
+      stars: 13,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
+    createdAt: '2026-03-17T00:00:00.000Z',
+    updatedAt: '2026-03-17T00:00:00.000Z',
+  },
+  {
+    id: 'skia-graphics',
+    name: 'React Native Skia Graphics',
+    slug: 'skia-graphics',
+    description: 'High-performance 2D graphics for React Native with GPU acceleration and charts',
+    content: skiaGraphicsContent,
+    tags: ['skia', 'graphics', 'charts', 'react-native', 'mobile', 'canvas'],
+    category: TemplateCategory.MOBILE,
+    difficulty: TemplateDifficulty.ADVANCED,
+    author: {
+      name: 'Claude Config Hub',
+      url: 'https://claudeconfig.com',
+    },
+    techStack: {
+      framework: 'React Native Skia',
+      frameworkVersion: '1.x',
+      language: 'TypeScript',
+      languageVersion: '5.x',
+      testing: ['Vitest'],
+    },
+    stats: {
+      views: 42,
+      copies: 21,
+      stars: 11,
+      forks: 3,
+    },
+    status: TemplateStatus.PUBLISHED,
+    featured: true,
     createdAt: '2026-03-17T00:00:00.000Z',
     updatedAt: '2026-03-17T00:00:00.000Z',
   },
