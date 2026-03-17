@@ -9,6 +9,7 @@ export enum TemplateCategory {
   DESKTOP = 'desktop',
   ML = 'ml',
   DEVOPS = 'devops',
+  TOOLING = 'tooling',
   OTHER = 'other',
 }
 
